@@ -1,0 +1,15 @@
+
+##to create a virtual environment just for once 
+python -m venv venv
+
+
+## to activate it ( make sure it is activated before starting the project)
+.\venv\Scripts\activate
+
+## to install all the packages
+pip install -r requirements.txt
+
+
+## for break point
+import pdb
+pdb.set_trace()
