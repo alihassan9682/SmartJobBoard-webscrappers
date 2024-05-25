@@ -1,6 +1,6 @@
 import time
 
-from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
+from helpers import configure_webdriver
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -25,14 +25,42 @@ def write_to_csv(data, directory, filename):
         for item in data:
             writer.writerow(item)
 
+def extract_location_details(location_string):
+    remote_status = False
+    cities = ""
+    states = ""
+    country = ""
+
+    locations = [location.strip() for location in location_string.split('/')]
+
+    for loc in locations:
+        if loc.startswith("Remote - "):
+            remote_status = True
+            loc = loc[len("Remote - "):]
+
+        parts = loc.split(',')
+        if len(parts) >= 3:
+            city = parts[0].strip()
+            state = parts[1].strip()
+            country = parts[2].strip()
+        elif len(parts) == 2:
+            city = parts[0].strip()
+            state = parts[1].strip()
+            country = "United States of America"
+        else:
+            city = state = country = ''
+
+        cities += city + ", "
+        states += state + ", "
+
+    cities = cities.rstrip(", ")
+    states = states.rstrip(", ")
+
+    return str(remote_status), cities, states, country
 
 def loadAllJobs(driver):
     JOBS = []
     wait = WebDriverWait(driver, 10)
-    essential = wait.until(
-        EC.presence_of_element_located((By.ID, "js-cookie-reject"))
-    )
-    essential.click()
     while True:
         results = wait.until(EC.presence_of_element_located(
             (By.ID, "js-job-search-results")
@@ -41,17 +69,15 @@ def loadAllJobs(driver):
             EC.presence_of_all_elements_located((By.CLASS_NAME, "card-job"))
         )
         jobs = [
-            [
-                job.find_element(By.CLASS_NAME, "js-view-job").get_attribute(
-                    "href"
-                ),
-            ]
+            job.find_element(By.CLASS_NAME, "js-view-job").get_attribute(
+                "href"
+            )
             for job in jobs
-        ]
+            ]
         try:
             JOBS = JOBS + jobs
             next = driver.find_element(
-                By.CSS_SELECTOR, "[title='Go to next page of results']"
+                By.CSS_SELECTOR, "aria-label='Next page'"
             ).get_attribute("href")
             driver.get(next)
         except:
@@ -65,7 +91,7 @@ def getJobs(driver):
     jobs = loadAllJobs(driver)
     for job in jobs:
         try:
-            driver.get(job[0])
+            driver.get(job)
             time.sleep(2)
             jobTitle = driver.find_element(By.CLASS_NAME, "hero-heading").text
             page_source = driver.page_source
@@ -77,48 +103,46 @@ def getJobs(driver):
             jobDescription = desc_content.prettify()
 
             job_meta = soup.find('ul', class_='job-meta')
+
             function_li = job_meta.find_all('li')
-            print('function lis', function_li[6].span.text.strip())
-            location = function_li[4].span.text.strip()
-            location_parts = location.split(',')
-            if len(location_parts) == 3:
-                city = location_parts[0].strip()
-                state = location_parts[1].strip()
-                country = location_parts[2].strip()
-            else:
-                city = state = ''
-                country = 'United States'
+            print('function lis', function_li[0].text.strip(), function_li[2].text.strip())
+            remote_status, cities, states, Country = extract_location_details(function_li[0].text.strip())
+            Location = function_li[0].text.strip()
+            City = cities
+            state = states
+            country = Country
             Zipcode = ''
+
             jobDetails = {
-                "Job Id": function_li[6].span.text.strip(),
+                "Job Id": function_li[2].text.strip(),
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
-                "Job Type": "",
+                "Job Type": 'Remote' if remote_status == 'True' else '',
                 "Categories": "Pharmaceuticals",
-                "Location": location,
-                "City": city,
+                "Location": Location,
+                "City": City,
                 "State": state,
                 "Country": country,
                 "Zip Code": Zipcode,
-                "Address": location,
-                "Remote": "",
+                "Address": Location,
+                "Remote": remote_status,
                 "Salary From": "",
                 "Salary To": "",
                 "Salary Period": "",
-                "Apply URL": job[0],
+                "Apply URL": job,
                 "Apply Email": "",
-                "Posting Date": function_li[5].span.text.strip(),
+                "Posting Date": "",
                 "Expiration Date": "",
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "N/A",
+                "Employer Email": "candidatesupport@regeneron.com",
                 "Full Name": "",
-                "Company Name": "Johnson and Johnson",
-                "Employer Website": "https://jobs.jnj.com/",
+                "Company Name": "Regeneron",
+                "Employer Website": "https://www.regeneron.com/",
                 "Employer Phone": "",
                 "Employer Logo": "",
-                "Company Description": "At Johnson & Johnson, we believe health is everything. Our strength in healthcare innovation empowers us to build a world where complex diseases are prevented, treated and cured, treatments are smarter and less invasive and solutions are personal.",
+                "Company Description": "Our commitment to patients extends well beyond our labs. We are proud to support the communities we serve, to embrace a culture and business model of patients over profits and to hold the highest ethical standards when it comes to patient well-being.",
             }
             JOBS.append(jobDetails)
 
@@ -131,11 +155,11 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://jobs.jnj.com/en/jobs/?search=sales&country=United+States&pagesize=20#results"
+        url = "https://careers.regeneron.com/en/jobs/?keyword=sales&country=United+States+of+America&pagesize=20#results"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
-            write_to_csv(Jobs, "data", "Jhonsan.csv")
+            write_to_csv(Jobs, "data", "Regeneron.csv")
         except Exception as e:
             print(f"Error : {e}")
     except Exception as e:
