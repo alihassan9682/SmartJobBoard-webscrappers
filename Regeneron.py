@@ -77,12 +77,12 @@ def loadAllJobs(driver):
         try:
             JOBS = JOBS + jobs
             next = driver.find_element(
-                By.CSS_SELECTOR, "aria-label='Next page'"
+                By.CSS_SELECTOR, "[aria-label='Next page']"
             ).get_attribute("href")
             driver.get(next)
+            print('helll', JOBS)
         except:
             break
-
     return JOBS
 
 
