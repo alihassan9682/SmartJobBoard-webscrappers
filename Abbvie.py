@@ -96,7 +96,13 @@ def getJobs(driver):
 
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
-            desc_content = soup.find("div", attrs={"data-type":"DescriptionWidget"})
+            desc_content = soup.find("div", attrs={"aria-label":"Job description"})
+            first_heading = desc_content.find("div", class_ = "jobad-companydescription")
+            first_p = desc_content.find("p")
+            
+            if (first_heading):
+                first_p.decompose()
+                first_heading.decompose()
 
             salary_range = soup.find("div", attrs={"data-type":"SalaryWidget"}).find_all('span')[1].text.strip()
             from_salary = to_salary = ''

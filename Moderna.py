@@ -84,8 +84,8 @@ def getJobs(driver):
             jobDescription = desc_content.prettify()
 
             selected_card = soup.find("div", class_='card-selected')
-            location_meta = selected_card.find("p",class_='position-location').text
-            Location = location_meta if location_meta else ''
+            location_meta = selected_card.find("p",class_='position-location')
+            Location = location_meta.text if location_meta else ''
 
             state = ''
 
@@ -116,7 +116,7 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "N/A",
+                "Employer Email": "msh@mshmoderna.com",
                 "Full Name": "",
                 "Company Name": "Moderna",
                 "Employer Website": "https://modernatx.eightfold.ai/",
