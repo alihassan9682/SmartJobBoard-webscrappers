@@ -124,7 +124,7 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "msh@mshsnafi.com",
+                "Employer Email": "msh@mshsnofi.com",
                 "Full Name": "",
                 "Company Name": "Sanofi",
                 "Employer Website": "https://en.jobs.sanofi.com/",
