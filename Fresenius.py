@@ -32,13 +32,9 @@ def write_to_csv(data, directory, filename):
 def loadAllJobs(driver):
     JOBS = []
     wait = WebDriverWait(driver, 10)
-    close = wait.until(
-        EC.presence_of_element_located((By.ID, "gdpr-button"))
-    )
-    close.click()
     
     while True:
-        # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
         results = wait.until(EC.presence_of_element_located(
             (By.ID, "search-results-list")
         ))
@@ -55,15 +51,14 @@ def loadAllJobs(driver):
         try:
             JOBS = JOBS + jobs
             print('HOBS', len(JOBS))
-            next_button = wait.until(
-                EC.presence_of_element_located((By.CLASS_NAME, "next"))
-            )
-            
+            next_button = driver.find_element(By.CLASS_NAME, "next")
             if next_button and 'disabled' not in next_button.get_attribute('class'):
-                actions = ActionChains(driver)
-                actions.move_to_element(next_button).click().perform()
+                driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
+                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "next")))
+                driver.execute_script("arguments[0].click();", next_button)
                 time.sleep(2)
             else:
+                print('no more next button')
                 break
         except:
             print("No more pages or an error occurred")
@@ -80,63 +75,51 @@ def getJobs(driver):
         try:
             driver.get(job)
             time.sleep(2)
-            job_elements = None
-            try:
-                job_elements = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, 'name-place'))
-                )
-            except:
-                job_elements = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, 'jd-intro'))
-                )
+            job_elements = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'intro'))
+            )
             jobTitle = job_elements.find_element(By.TAG_NAME, 'h1').text
-            # info_bar = job_elements.find_element(By.CLASS_NAME, 'info-bar')
-            job_id_element = job_elements.find_element(By.CLASS_NAME, 'job-id')
-            job_id = job_id_element.text.replace("Req #: ", "").strip() if job_id_element else jobs.index(job)
-            location_element = job_elements.find_element(By.CLASS_NAME, 'job-location')
-            Location_ist = location_element.text.replace("Location:", "").strip() if location_element else ''
-            Location = Location_ist
-            try:
-                additional_locations_element = job_elements.find_element(By.CLASS_NAME, 'job-additional-locations')
-                Additional_Locations = additional_locations_element.text.replace("Additional locations", "").strip()
-                Location += ", " + Additional_Locations
-            except:
-                pass
-            
-            date_posted_element = job_elements.find_element(By.CLASS_NAME, 'job-date')
-            posted_date = date_posted_element.text.replace("Date posted: ", "").strip() if date_posted_element else ''
-            
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="ats-description")
             jobDescription = desc_content.prettify()
-            location_parts = Location_ist.split(',')
-            City = state = job_type = ''
-            if len(location_parts) == 3:
-                City = location_parts[0].strip()
-                state = location_parts[1].strip()
-            elif len(location_parts) ==2:
-                City = location_parts[0].strip()
-                state = ''
-            else:
-                City = state = ''
-            country = 'Unites States'
 
+            cities = []
+            states = []
+
+            location_meta = soup.find('span', class_="loc")
+            location_content = location_meta.text if location_meta else ''
+            location_parts = location_content.split('|')
+            locations = []
+
+            for part in location_parts:
+                parts = part.split(',')
+                if len(parts) == 2:
+                    locations.append(part)
+                    cities.append(parts[0])
+                    states.append(parts[1])
+
+            Location = ' | '.join(locations)
+            City = ', '.join(cities) if cities else ''
+            state = ', '.join(states) if states else ''
+            country = 'United States'
             Zipcode = ''
-            print("Job", job_type)
+            
+            job_id_meta = soup.find('span',class_='job-referencee job-info')
+            job_id = job_id_meta.text.replace("Job ID", "").strip() if job_id_meta else jobs.index(job)
+
             print("Location", Location)
-            print("Posted Date", posted_date)
             print("Job Id", job_id)
             print("Job Title", jobTitle)
             print("city", City)
             print("state", state)
             print("country", country)
-            print('remote', is_remote(Location))
+            print('remote', is_remote(jobTitle))
             jobDetails = {
                 "Job Id": job_id,
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
-                "Job Type": job_type,
+                "Job Type": '',
                 "Categories": "Medical Device",
                 "Location": Location,
                 "City": City,
@@ -150,7 +133,7 @@ def getJobs(driver):
                 "Salary Period": "",
                 "Apply URL": job,
                 "Apply Email": "",
-                "Posting Date": posted_date,
+                "Posting Date": '',
                 "Expiration Date": "",
                 "Applications": "",
                 "Status": "",
