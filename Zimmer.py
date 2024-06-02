@@ -124,7 +124,7 @@ def getJobs(driver):
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
                 "Job Type": "",
-                "Categories": "Pharmaceuticals",
+                "Categories": "Medical Device",
                 "Location": location,
                 "City": city,
                 "State": state,
