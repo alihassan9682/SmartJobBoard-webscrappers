@@ -1,41 +1,48 @@
 from selenium import webdriver
-from bs4 import BeautifulSoup
-import csv
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
+# Initialize the webdriver
+driver = webdriver.Chrome()
 
-# Function to scrape text with formatting
-def scrape_website(url):
-    # Initialize Selenium WebDriver
-    driver = (
-        webdriver.Chrome()
-    )  # Or use any other WebDriver based on your browser choice
-    driver.get(url)
+try:
+    # Open the URL
+    driver.get(
+        "https://bbrauncareers-bbraun.icims.com/jobs/search?pr=1&searchKeyword=sales&searchLocation=12781--&searchRelation=keyword_all&mobile=false&width=1168&height=500&bga=true&needsRedirect=false&jan1offset=240&jun1offset=240"
+    )
 
-    # Get the page source
-    page_source = driver.page_source
-    
-    # Close the WebDriver
+    # Wait for the job listings table to be present
+    wait = WebDriverWait(driver, 20)  # Increase the timeout if needed
+    job_table = wait.until(
+        EC.presence_of_element_located((By.CLASS_NAME, "iCIMS_JobsTable"))
+    )
+
+    # Print the page source to verify the content
+    print(driver.page_source)
+
+    # Use XPath to find job listings
+    job_listings = job_table.find_elements(
+        By.XPATH, ".//div[contains(@class, 'row')]"
+    )  # Adjust the XPath as needed
+
+    for job in job_listings:
+        try:
+            title_element = job.find_element(
+                By.XPATH, ".//div[contains(@class, 'title')]"
+            )
+            location_element = job.find_element(
+                By.XPATH, ".//div[contains(@class, 'location')]"
+            )
+            title = title_element.text if title_element else "N/A"
+            location = location_element.text if location_element else "N/A"
+            print(f"Job Title: {title}, Location: {location}")
+        except Exception as job_e:
+            print(f"Error extracting job details: {job_e}")
+
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+finally:
+    # Close the browser
     driver.quit()
-    soup = BeautifulSoup(page_source, "html.parser")
-    main_content = soup.find(
-        "span", class_="jobdescription"
-    ) 
-
-    # Extract text with formatting
-    formatted_text = main_content.prettify()
-
-    return formatted_text
-
-
-# Function to save text to CSV
-def save_to_csv(text, filename):
-    with open(filename, "w", newline="", encoding="utf-8") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(["Formatted Text"])
-        writer.writerow([text])
-
-
-# Example usage
-url = "https://careers.olympusamerica.com/job/Center-Valley-Senior-Sales-Training-Manager%2C-Surgical-Solutions-Energy-&-Systems-Integration-PA-18034-0610/1168373900/"  # Replace with the URL of the website you want to scrape
-formatted_text = scrape_website(url)
-save_to_csv(formatted_text, "scraped_text.csv")
