@@ -121,7 +121,7 @@ def getJobs(driver):
 
 def scraping():
     try:
-        driver = configure_webdriver(True)
+        driver = configure_webdriver(False)
         driver.maximize_window()
         url = "https://jobs.merck.com/us/en/search-results?keywords=sales"
         try:
