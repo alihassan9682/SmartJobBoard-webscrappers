@@ -110,8 +110,17 @@ def getJobs(driver):
             soup = BeautifulSoup(page_source, "html.parser")
             job_meta = soup.find("h1", class_="position-title")
             jobTitle = job_meta.text if job_meta else ''
-            desc_content = soup.find("div", class_="position-job-description-column")
-            jobDescription = desc_content.prettify() if desc_content else ''
+            
+            # Extract job description and remove spans and inline styles
+            desc_content = soup.find("div", class_="position-job-description")
+            if desc_content:
+                for span in desc_content.find_all("span"):
+                    span.unwrap()  # Remove the <span> tags but keep their text
+                for tag in desc_content.find_all(True):
+                    tag.attrs = {}  # Remove all attributes from all tags
+                jobDescription = desc_content.prettify(formatter="html")
+            else:
+                jobDescription = ''
 
             selected_card = soup.find("div", class_='card-selected')
             location_meta = selected_card.find("p", class_='position-location')
@@ -162,7 +171,6 @@ def getJobs(driver):
         except Exception as e:
             print(f"Error in loading post details: {e}")
     return JOBS
-
 
 def scraping():
     try:
