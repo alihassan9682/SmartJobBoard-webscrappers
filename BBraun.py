@@ -1,20 +1,15 @@
 import time
-
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
-
 from bs4 import BeautifulSoup
 import csv
 import os
 
-
 def request_url(driver, url):
     driver.get(url)
-
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -27,52 +22,61 @@ def write_to_csv(data, directory, filename):
         for item in data:
             writer.writerow(item)
 
-
 def loadAllJobs(driver):
     JOBS = []
+    unique_jobs = set()
     wait = WebDriverWait(driver, 20)
 
     while True:
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         try:
-            results = wait.until(EC.presence_of_element_located(
-                (By.CLASS_NAME, "container-fluid iCIMS_JobsTable")
-            ))
-        except TimeoutException:
-            print("Timeout: The element with class 'container-fluid iCIMS_JobsTable' was not found within the specified timeout.")
-        
-        print("results", results)
-        jobs = WebDriverWait(results, 10).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "row"))
-        )
-        print('Waiting for', results)
-        jobs = [
-            job.find_element(By.CLASS_NAME, "col-xs-12 title").find_element(By.TAG_NAME, 'a').get_attribute("href")
-            for job in jobs
-        ]
-        try:
-            JOBS = JOBS + jobs
-            print('running jobs', len(JOBS))
-            next_button = driver.find_elements(By.XPATH, ".//a[contains(@class, 'glyph')]")[-1]
-            if 'invisible' in next_button.get_attribute('class'):
-                break
+            iframe = wait.until(EC.presence_of_element_located((By.ID, 'icims_content_iframe')))
+            driver.switch_to.frame(iframe)
+
+            results = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "iCIMS_JobsTable")))
+            jobs = results.find_elements(By.CLASS_NAME, "row")
+
+            job_links = [
+                job.find_element(By.CLASS_NAME, "title").find_element(By.TAG_NAME, 'a').get_attribute("href")
+                for job in jobs
+            ]
+
+            for job in job_links:
+                if job not in unique_jobs:
+                    print('hihi', job)
+                    unique_jobs.add(job)
+                    JOBS.append(job)
+
+            next_button = driver.find_elements(By.CSS_SELECTOR, ".iCIMS_Paging .glyph")[-1]
+            if 'invisible' not in next_button.get_attribute('class'):
+                print('hello')
+                driver.execute_script("arguments[0].scrollIntoView();", next_button)
+                next_button.click()
+                time.sleep(2)
             else:
-                next = next_button.get_attribute("href")
-                driver.get(next)
-        except:
+                break
+            driver.switch_to.default_content()
+        except TimeoutException:
+            print("Timeout: The element was not found within the specified timeout.")
             break
+        except Exception as e:
+            print(f"An error occurred while loading jobs: {e}")
+            break
+        print('total', len(JOBS))
+        driver.switch_to.default_content()
 
     return JOBS
-
 
 def getJobs(driver):
     JOBS = []
     jobs = loadAllJobs(driver)
+    wait = WebDriverWait(driver, 20)
     for job in jobs:
         try:
-            driver.get(job[0])
-            time.sleep(2)
-            jobTitle = driver.find_element(By.CLASS_NAME, "iCIMS_Header").text
+            driver.get(job)
+            time.sleep(3)
+
+            iframe = wait.until(EC.presence_of_element_located((By.ID, 'icims_content_iframe')))
+            driver.switch_to.frame(iframe)
             Location = "United States"
             City = ''
             state = ''
@@ -81,31 +85,36 @@ def getJobs(driver):
 
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
+            # job_meta = soup.find("div", class_="iCIMS_Header")
+            # jobTitle = job_meta.text if job_meta else ''
             desc_content = soup.find("div", class_="iCIMS_JobContent")
             first_para = desc_content.find("div", class_="container-fluid iCIMS_JobsTable")
             last_para = desc_content.find("div", class_="iCIMS_Logo")
-            if (first_para):
+            if first_para:
                 first_para.decompose()
-            if (last_para):
+            if last_para:
                 last_para.decompose()
             jobDescription = desc_content.prettify()
 
-            additional_fields = soup.find('div', class_='col-xs-12 additionalFields')
+            jobTitle = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "iCIMS_Header"))).text
+
+            additional_fields_element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "col-xs-12.additionalFields")))
+            additional_fields = additional_fields_element.find_elements(By.CLASS_NAME, "iCIMS_JobHeaderTag")
 
             job_details = {}
+            if additional_fields:
+                for field in additional_fields:
+                    field_name_element = field.find_element(By.CLASS_NAME, 'iCIMS_JobHeaderField')
+                    field_value_element = field.find_element(By.CLASS_NAME, 'iCIMS_JobHeaderData')
+                    field_name = field_name_element.text.strip()
+                    field_value = field_value_element.text.strip()
+                    job_details[field_name] = field_value
 
-            for tag in additional_fields.find_all('div', class_='iCIMS_JobHeaderTag'):
-                field_name = tag.find('dt', class_='iCIMS_JobHeaderField').text.strip()
-                field_value = tag.find('dd', class_='iCIMS_JobHeaderData').text.strip()
-                job_details[field_name] = field_value
-
-            for key, value in job_details.items():
-                print(f"{key}: {value}")
             jobDetails = {
-                "Job Id": job_details['Requisition ID'] if job_details['Requisition ID'] else jobs.index(job),
+                "Job Id": job_details.get('Requisition ID', jobs.index(job)),
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
-                "Job Type": job_details['Position Type'] if job_details['Position Type'] else '',
+                "Job Type": job_details.get('Position Type', ''),
                 "Categories": "Medical Device",
                 "Location": Location,
                 "City": City,
@@ -127,23 +136,24 @@ def getJobs(driver):
                 "Employer Email": "msh@mshbbraun.com",
                 "Full Name": "",
                 "Company Name": "B Braun",
-                "Employer Website": " https://bbrauncareers-bbraun.icims.com/",
+                "Employer Website": "https://bbrauncareers-bbraun.icims.com/",
                 "Employer Phone": "",
                 "Employer Logo": "",
-                "Company Description": "The B. Braun Group of Companies leads in thoughtful solutions that address real issues in patient care and clinician safety.  The global slogan, Sharing Expertise® fosters a teamwork approach to saving lives and solving the problems of the health care industry.  It is an ethical and purposeful work culture that welcomes innovation and rewards progress.",
+                "Company Description": "The B. Braun Group of Companies leads in thoughtful solutions that address real issues in patient care and clinician safety. The global slogan, Sharing Expertise® fosters a teamwork approach to saving lives and solving the problems of the health care industry. It is an ethical and purposeful work culture that welcomes innovation and rewards progress.",
             }
             JOBS.append(jobDetails)
+
+            driver.switch_to.default_content()
 
         except Exception as e:
             print(f"Error in loading post details: {e}")
     return JOBS
 
-
 def scraping():
     try:
-        driver = configure_webdriver(True)
+        driver = configure_undetected_chrome_driver(True)
         driver.maximize_window()
-        url = " https://bbrauncareers-bbraun.icims.com/jobs/search?ss=1&searchKeyword=sales&searchRelation=keyword_all&searchLocation=12781--"
+        url = "https://bbrauncareers-bbraun.icims.com/jobs/search?ss=1&searchKeyword=sales&searchRelation=keyword_all&searchLocation=12781--"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
@@ -152,6 +162,5 @@ def scraping():
             print(f"Error : {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
-
 
 scraping()
