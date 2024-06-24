@@ -47,7 +47,7 @@ def loadAllJobs(driver):
                 )
             for job in jobs
         ]
-        print('hihihi', len(jobs))
+        print('total jobs', len(jobs))
         try:
             JOBS = JOBS + jobs
             print('HOBS', len(JOBS))

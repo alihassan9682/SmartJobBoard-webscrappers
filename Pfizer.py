@@ -82,7 +82,7 @@ def loadAllJobs(driver):
             print('tital', len(jobs))
             try:
                 JOBS = JOBS + jobs
-                print('hihih', len(JOBS))
+                print('total jobs', len(JOBS))
                 next_button_div = driver.find_element(By.ID, "next-page")
                 next_button = next_button_div.find_element(By.TAG_NAME, 'a')
                 if 'disabled' in next_button_div.get_attribute('class'):

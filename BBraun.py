@@ -42,7 +42,6 @@ def loadAllJobs(driver):
 
             for job in job_links:
                 if job not in unique_jobs:
-                    print('hihi', job)
                     unique_jobs.add(job)
                     JOBS.append(job)
 
