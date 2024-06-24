@@ -1,6 +1,14 @@
 import subprocess
+import os
+import sys
+
+if getattr(sys, 'frozen', False):
+    current_dir = sys._MEIPASS
+else:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
 scrapers = [
+    'Lantheus.py',
     'Abbott.py',
     'Abbvie.py',
     'Amgen.py',
@@ -23,7 +31,6 @@ scrapers = [
     'GSK.py',
     'Guardant.py',
     'Jhonsan.py',
-    'Lantheus.py',
     'Medline.py',
     'Medtronic.py',
     'Merck.py',
@@ -50,7 +57,11 @@ scrapers = [
 
 def run_scraper(scraper):
     try:
-        result = subprocess.run(['python', scraper], check=True)
+        # Construct full path to scraper script
+        scraper_path = os.path.join(current_dir, scraper)
+        
+        # Run the scraper script
+        result = subprocess.run(['python', scraper_path], check=True)
         print(f"{scraper} completed successfully.")
         return True
     except subprocess.CalledProcessError as e:
