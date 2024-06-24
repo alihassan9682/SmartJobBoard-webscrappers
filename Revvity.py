@@ -1,6 +1,6 @@
 import time
 
-from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
+from helpers import configure_webdriver, is_remote
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -32,9 +32,12 @@ def write_to_csv(data, directory, filename):
 def loadAllJobs(driver):
     JOBS = []
     wait = WebDriverWait(driver, 10)
+    close = wait.until(
+        EC.presence_of_element_located((By.ID, "system-ialert-reject-button"))
+    )
+    close.click()
     
     while True:
-
         results = wait.until(EC.presence_of_element_located(
             (By.ID, "search-results-list")
         ))
@@ -51,14 +54,15 @@ def loadAllJobs(driver):
         try:
             JOBS = JOBS + jobs
             print('HOBS', len(JOBS))
-            next_button = driver.find_element(By.CLASS_NAME, "next")
+            next_button = wait.until(
+                EC.presence_of_element_located((By.CLASS_NAME, "next"))
+            )
+            
             if next_button and 'disabled' not in next_button.get_attribute('class'):
-                driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
-                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "next")))
-                driver.execute_script("arguments[0].click();", next_button)
+                actions = ActionChains(driver)
+                actions.move_to_element(next_button).click().perform()
                 time.sleep(2)
             else:
-                print('no more next button')
                 break
         except:
             print("No more pages or an error occurred")
@@ -75,52 +79,30 @@ def getJobs(driver):
         try:
             driver.get(job)
             time.sleep(2)
-            job_elements = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, 'intro'))
-            )
-            jobTitle = job_elements.find_element(By.TAG_NAME, 'h1').text
+
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
-            desc_content = soup.find("div", class_="ats-description")
-            jobDescription = desc_content.prettify()
-
-            cities = []
-            states = []
-
-            location_meta = soup.find('span', class_="loc")
-            location_content = location_meta.text if location_meta else ''
-            location_parts = location_content.split('|')
-            locations = []
-
-            for part in location_parts:
-                parts = part.split(',')
-                if len(parts) == 2:
-                    locations.append(part)
-                    cities.append(parts[0])
-                    states.append(parts[1])
-
-            Location = ' | '.join(locations)
-            City = ', '.join(cities) if cities else ''
-            state = ', '.join(states) if states else ''
+            title_meta = soup.find("div", class_= "hero-job-details-title")
+            jobTitle = title_meta.find('h1').text if title_meta else ''
+            job_id_meta = title_meta.find('span', class_="job-id job-info")
+            job_id = job_id_meta.get_text(strip=True).replace("Req ID", "") if job_id_meta else jobs.index(job)
+            desc_content = soup.find("section", class_="job-description")
+            desc_meta = desc_content.find("div", class_= "ats-description")
+            jobDescription = desc_meta.prettify() if desc_meta else ''
+            location_meta = title_meta.find("span", class_="job-location job-info")
+            City = state = job_type =''
+            Location = location_meta.text if location_meta else ''
             country = 'United States'
             Zipcode = ''
-            
-            job_id_meta = soup.find('span',class_='job-referencee job-info')
-            job_id = job_id_meta.text.replace("Job ID", "").strip() if job_id_meta else jobs.index(job)
-
             print("Location", Location)
-            print("Job Id", job_id)
             print("Job Title", jobTitle)
-            print("city", City)
-            print("state", state)
-            print("country", country)
-            print('remote', is_remote(jobTitle))
+            print('remote', is_remote(Location))
             jobDetails = {
                 "Job Id": job_id,
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
-                "Job Type": '',
-                "Categories": "Medical Device",
+                "Job Type": job_type,
+                "Categories": "Diagnostic",
                 "Location": Location,
                 "City": City,
                 "State": state,
@@ -128,23 +110,23 @@ def getJobs(driver):
                 "Zip Code": Zipcode,
                 "Address": Location,
                 "Remote": is_remote(Location),
-                "Salary From": '',
-                "Salary To": '',
+                "Salary From": "",
+                "Salary To": "",
                 "Salary Period": "",
                 "Apply URL": job,
                 "Apply Email": "",
-                "Posting Date": '',
+                "Posting Date": "",
                 "Expiration Date": "",
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "msh@mshfresenius.com",
+                "Employer Email": "msh@mshrevvity.com",
                 "Full Name": "",
-                "Company Name": "Fresenius",
-                "Employer Website": " https://jobs.fmcna.com/",
+                "Company Name": "Revvity",
+                "Employer Website": "https://jobs.revvity.com/",
                 "Employer Phone": "",
-                "Employer Logo": "https://tbcdn.talentbrew.com/company/488/full_v1_0-gst/img/logo-blue-0033a0.png",
-                "Company Description": "We're the largest provider of renal care products and services in the nation, including state-of-the-art dialysis machines, dialyzers and pharmaceuticals, and we are home to the country's largest renal specialty laboratories. We supply unsurpassed personalized dialysis care services including hemodialysis, home dialysis and transplant support services, and in-center services.",
+                "Employer Logo": "https://tbcdn.talentbrew.com/company/20539/v3_0/img/revvity-animated-logo.gif",
+                "Company Description": "Impossible is inspiration.If they say “impossible,” we say “challenge accepted.” At Revvity, we fearlessly face tomorrow’s unknowns for a healthier humankind.",
             }
             JOBS.append(jobDetails)
 
@@ -157,11 +139,11 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://jobs.fmcna.com/search-jobs/sales/United%20States/488/1/2/6252001/39x76/-98x5/50/2"
+        url = "https://jobs.revvity.com/search-jobs/sales/United%20States/20539/1/2/6252001/39x76/-98x5/50/2"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
-            write_to_csv(Jobs, "data", "Fresenius.csv")
+            write_to_csv(Jobs, "data", "Revvity.csv")
         except Exception as e:
             print(f"Error : {e}")
     except Exception as e:

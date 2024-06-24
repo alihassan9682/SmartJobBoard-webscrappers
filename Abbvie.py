@@ -50,7 +50,7 @@ def loadAllJobs(driver):
                 if job not in unique_jobs:
                     unique_jobs.add(job)
                     JOBS.append(job)
-            print('hihihi', len(JOBS))
+            print('total jobs', len(JOBS))
             next_page_number = current_page + 1
             next_page_elements = driver.find_elements(By.CSS_SELECTOR, f"a[href='javascript:pagination({next_page_number})']")
             

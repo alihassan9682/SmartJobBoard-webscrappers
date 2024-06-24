@@ -51,7 +51,7 @@ def loadAllJobs(driver):
                 )
             for job in jobs
         ]
-        print('hihihi', len(jobs))
+        print('total jobs', len(jobs))
         try:
             JOBS = JOBS + jobs
             print('HOBS', len(JOBS))
@@ -107,13 +107,10 @@ def getJobs(driver):
             for span in all_job_date_spans:
                 if "ADDITIONAL LOCATIONS:" in span.get_text(separator=" "):
                     additional_locations_span = span
-                    print('hihi1', span.get_text)
                 if "DATE POSTED:" in span.get_text():
                     posted_date = span.text.split("DATE POSTED: ")[1].strip()
-                    print('hihi2', span.get_text)
                 if "SALARY RANGE:" in span.get_text():
                     salary_range = span.text.split("SALARY RANGE: ")[1].strip()
-                    print('hih3', span.get_text)
 
             if additional_locations_span:
                 additional_locations_text = additional_locations_span.get_text(separator=" ").split("ADDITIONAL LOCATIONS: ")[1].strip()

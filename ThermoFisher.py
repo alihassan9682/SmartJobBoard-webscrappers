@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import csv
 import os
 
-from helpers import configure_webdriver, is_remote  # Ensure these imports are correct for your environment
+from helpers import configure_webdriver, is_remote  
 
 def request_url(driver, url):
     driver.get(url)
@@ -27,12 +27,12 @@ def loadAllJobs(driver):
     JOBS = []
     wait = WebDriverWait(driver, 10)
     close = wait.until(
-        EC.presence_of_element_located((By.CLASS_NAME, "evidon-banner-acceptbutton"))
+        EC.presence_of_element_located((By.CSS_SELECTOR, "[data-ph-at-id='cookie-close-link']"))
     )
     close.click()
 
     location_section = wait.until(
-        EC.presence_of_element_located((By.ID, "Country/TerritoryAccordion"))
+        EC.presence_of_element_located((By.CSS_SELECTOR, "[id='CountryAccordion']"))
     )
     actions = ActionChains(driver)
     actions.move_to_element(location_section).perform()
@@ -45,7 +45,7 @@ def loadAllJobs(driver):
     time.sleep(1)
 
     driver.execute_script("arguments[0].click();", checkbox)
-    time.sleep(1)
+    time.sleep(2)
 
     while True:
             results = wait.until(EC.presence_of_element_located(
@@ -62,18 +62,12 @@ def loadAllJobs(driver):
             ]
             try:
                 JOBS = JOBS + jobs
-                print('total jobs', len(JOBS))
-                next_button = driver.find_element(By.CLASS_NAME, "next-btn")
-                if 'aurelia-hide' in next_button.get_attribute('class'):
-                    print('No more pages', len(JOBS))
-                    break
-                else:
-                    driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
-                    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((next_button)))
-                    driver.execute_script("arguments[0].click();", next_button)
-                    time.sleep(2)
-            except Exception as e:
-                print(f"Error locating or clicking next button: {e}")
+                print('total', len(JOBS))
+                next = driver.find_element(
+                    By.CSS_SELECTOR, "[data-ph-at-id='pagination-next-link']"
+                ).get_attribute("href")
+                driver.get(next)
+            except:
                 break
     return JOBS
 
@@ -84,61 +78,58 @@ def getJobs(driver):
     for job in jobs:
         try:
             driver.get(job)
-            time.sleep(1)
+            time.sleep(2)
             job_meta = driver.find_element(By.CLASS_NAME, "job-title")
             jobTitle = job_meta.text if job_meta else ''
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="jd-info")
-            jobDescription = desc_content.prettify()
+            jobDescription = desc_content.prettify() if desc_content else ''
+            location = city = state = ''
+            country = 'United States of America'
             location_meta = soup.find('span', class_='au-target job-location')
             if location_meta:
-                location = location_meta.get_text(strip=True).replace("Location", "") if location_meta else ''
+                location = location_meta.get_text(strip=True)
                 location_parts = location.split(',') if location else ''
-                if len(location_parts) == 4:
+                if len(location_parts) == 3:
                     city = location_parts[0].strip()
                     state = location_parts[1].strip()
                     country = location_parts[2].strip()
-                    Zipcode = location_parts[3].strip
-                elif len(location_parts) == 3:
-                    city = location_parts[0].strip()
-                    state = location_parts[1].strip()
-                    country = location_parts[2].strip()
-                    Zipcode = ''
                 else:
                     city = state = ''
                     country = 'United States of America'
             try:
-                mul_location_btn = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "multi-job btn-link au-target"))
+                mul_location = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "see-multiple-loc-btn"))
                 )
-                if mul_location_btn:
-                    mul_location_btn.click()
-                    time.sleep(1)
-                    locations_meta = driver.find_elements(By.XPATH, "//span[@data-ph-id='ph-wt84jb-job-fields-ph-job-details-v1wt84jb-5WgsmB']")
+                if mul_location:
+                    mul_location.click()
+                    locations_meta = driver.find_elements(By.XPATH, "//span[@data-ph-id='ph-page-element-page8-t4HcBr']")
                     locations = [loc.text.strip() for loc in locations_meta if "United States of America" in loc.text]
                     if locations:
                         location = ', '.join(locations)
                         city = ', '.join([loc.split(',')[0].strip() for loc in locations if loc[0]])
-                        state = ', '.join([loc.split(',')[1].strip() for loc in locations if loc[0]])
-                        country = 'United States of America'
-                        Zipcode = '9999'
-                    else:
-                        city = state = Zipcode = ''
+                        print('city', city)
+                        state = ', '.join([loc.split(',')[1].strip() for loc in locations if loc[1]])
                         country = 'United States of America'
                 else:
                     print('issue with the location')
             except:
                 pass
+            print('location', location)
+            print('city',city)
+            print('state', state)
+            Zipcode = ''
             date_posted = soup.find('div', class_='job-info au-target')['data-ph-at-job-post-date-text']
+            job_type = soup.find('div', class_='job-info au-target')['data-ph-at-job-type-text']
             job_id = soup.find('span', class_='au-target jobId').get_text(strip=True).replace("Job Id","")
 
             jobDetails = {
                 "Job Id": job_id,
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
-                "Job Type": "",
-                "Categories": "Medical Device",
+                "Job Type": job_type if job_type else '',
+                "Categories": "Diagnostics",
                 "Location": location,
                 "City": city,
                 "State": state,
@@ -156,13 +147,13 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "N/A",
+                "Employer Email": "msh@mshthermofisher.com",
                 "Full Name": "",
-                "Company Name": "GE",
-                "Employer Website": "https://careers.gehealthcare.com/",
+                "Company Name": "Thermo Fisher",
+                "Employer Website": "https://jobs.thermofisher.com/",
                 "Employer Phone": "",
-                "Employer Logo": "https://cdn.phenompeople.com/CareerConnectResources/GEVGHLGLOBAL/images/1694706045469_GE-HLTHCR_Standard_RGB-CompPrpl1-1674000514001.png",
-                "Company Description": "GE HealthCare does NOT request payment associated with career opportunities at any point during the process. If you have provided personal information, such as a credit card number, to someone posing as a GE HealthCare talent acquisition partner, please report the details to your local authorities immediately.",
+                "Employer Logo": "https://cdn.phenompeople.com/CareerConnectResources/TFSCGLOBAL/en_global/desktop/assets/images/header_logo.png",
+                "Company Description": "Thermo Fisher Scientific Inc. is the world leader in serving science, with annual revenue of more than $40 billion. Our Mission is to enable our customers to make the world healthier, cleaner and safer. Whether our customers are accelerating life sciences research, solving complex analytical challenges, increasing productivity in their laboratories, improving patient health through diagnostics or the development and manufacture of life-changing therapies, we are here to support them",
             }
             JOBS.append(jobDetails)
 
@@ -175,11 +166,11 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://careers.gehealthcare.com/global/en/search-results?keywords=sales"
+        url = "https://jobs.thermofisher.com/global/en/search-results?m=3&keywords=sales"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
-            write_to_csv(Jobs, "data", "GE.csv")
+            write_to_csv(Jobs, "data", "ThermoFisher.csv")
         except Exception as e:
             print(f"Error : {e}")
     except Exception as e:

@@ -32,27 +32,17 @@ def write_to_csv(data, directory, filename):
 def loadAllJobs(driver):
     JOBS = []
     wait = WebDriverWait(driver, 10)
-    close = wait.until(
-        EC.presence_of_element_located((By.ID, "gdpr-button"))
-    )
-    close.click()
-    
     while True:
         results = wait.until(EC.presence_of_element_located(
-            (By.ID, "search-results-list")
+            (By.CLASS_NAME, "table")
         ))
-        jobs = WebDriverWait(results, 10).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "search-results-list-item"))
-        )
-        jobs = [
-                job.find_element(By.TAG_NAME, "a").get_attribute(
-                    "href"
-                )
-            for job in jobs
-        ]
-        print('total jobs', len(jobs))
+        job_links = results.find_elements(By.CSS_SELECTOR, "tr > td > a")
+        
+        for link in job_links:
+            job_url = link.get_attribute("href")
+            if job_url and job_url not in JOBS:
+                JOBS.append(job_url)
         try:
-            JOBS = JOBS + jobs
             print('HOBS', len(JOBS))
             next_button = wait.until(
                 EC.presence_of_element_located((By.CLASS_NAME, "next"))
@@ -79,55 +69,68 @@ def getJobs(driver):
         try:
             driver.get(job)
             time.sleep(2)
-            job_meta = driver.find_element(By.CLASS_NAME, "search-title")
+            job_meta = driver.find_element(By.CLASS_NAME, "job-title")
             jobTitle = job_meta.text if job_meta else ''
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
-            desc_content = soup.find("div", class_="ats-description")
+            desc_content = soup.find("div", class_="job-description")
+            job_type_meta = soup.find("span", {'id': 'employment_type_2_2_0_0'})
+            job_type = job_type_meta.text.strip() if job_type_meta else ''
             jobDescription = desc_content.prettify()
-            job_id = soup.find("span", class_="job-id job-info").text.replace("Job ID ", "").strip() if soup.find("span", class_="job-id job-info") else ""
-            posted_date = soup.find("span", class_="job-date job-info").text.replace("Date posted", "").strip() if soup.find("span", class_="job-date job-info") else ""
+            locations = soup.find_all('span', id=lambda x: x and x.startswith('location_'))
 
-            City = state = ''
-            country = 'Unites States'
+            location_list = []
+            city_list = []
+            state_list = []
+            country = "United States"
 
+            for location in locations:
+                loc_text = location.get_text(strip=True)
+                parts = [part.strip() for part in loc_text.split(',')]
+                
+                if len(parts) == 3:
+                    city_list.append(parts[0])
+                    state_list.append(parts[1])
+                
+                location_list.append(loc_text)
+            location = ', '.join(location_list) if location_list else ''
+            City = ', '.join(city_list) if city_list else ''
+            state = ', '.join(state_list) if state_list else ''
             Zipcode = ''
-            print("Posted Date", posted_date)
-            print("Job Id", job_id)
             print("Job Title", jobTitle)
             print("city", City)
             print("state", state)
             print("country", country)
             jobDetails = {
-                "Job Id": job_id,
+                "Job Id": jobs.index(job),
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
-                "Job Type": '',
-                "Categories": "Medical Device",
-                "Location": '',
+                "Job Type": job_type if job_type else '',
+                "Categories": "Diagnostic",
+                "Location": location,
                 "City": City,
                 "State": state,
                 "Country": country,
                 "Zip Code": Zipcode,
-                "Address": country,
+                "Address": location,
                 "Remote": '',
                 "Salary From": '',
                 "Salary To": '',
                 "Salary Period": "",
                 "Apply URL": job,
                 "Apply Email": "",
-                "Posting Date": posted_date,
+                "Posting Date": '',
                 "Expiration Date": "",
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "msh@mshbectondickson.com",
+                "Employer Email": "msh@mshfoundation.com",
                 "Full Name": "",
-                "Company Name": "Becton Dickson",
-                "Employer Website": "https://jobs.bd.com/",
+                "Company Name": "Foundation Medicine",
+                "Employer Website": "https://careers.foundationmedicine.com",
                 "Employer Phone": "",
-                "Employer Logo": "",
-                "Company Description": "",
+                "Employer Logo": "https://files.clinchtalent.com/foundation-medicine…503f1be2ea7611d2d34a5d746b33d4/Logos/fmi-logo.png",
+                "Company Description": "Foundation Medicine began with an idea—to simplify the complex nature of cancer genomics, bringing cutting-edge science and technology to everyday cancer care. Our approach generates insights that help doctors match patients to more treatment options and helps accelerate the development of new therapies. Foundation Medicine is the culmination of talented people coming together to realize an important vision, and the work we do every day impacts real lives.",
             }
             JOBS.append(jobDetails)
 
@@ -140,11 +143,11 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://jobs.bd.com/search-jobs/sales/United%20States/159/1/2/6252001/39x76/-98x5/0/2"
+        url = "https://careers.foundationmedicine.com/jobs/search?block_index=0&block_uid=e212863cb3af48a84294098bca2a239c&country_codes%5B%5D=US&location_uids=&page=1&page_row_index=3&page_row_uid=7f0237d79099871492807d60f29486e5&page_version_uid=62d51d9cd9bb6f2ececd64f314111712&query=sales&search_cities=&search_country_codes=&search_departments=&sort="
         try:
             driver.get(url)
             Jobs = getJobs(driver)
-            write_to_csv(Jobs, "data", "Becton.csv")
+            write_to_csv(Jobs, "data", "Foundation.csv")
         except Exception as e:
             print(f"Error : {e}")
     except Exception as e:

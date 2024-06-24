@@ -26,6 +26,10 @@ def loadAllJobs(driver):
     JOBS = []
     unique_jobs = set()
     wait = WebDriverWait(driver, 20)
+    cookies = wait.until(
+        EC.presence_of_element_located((By.ID, "onetrust-accept-btn-handler"))
+    )
+    cookies.click()
 
     while True:
         try:
@@ -108,11 +112,11 @@ def getJobs(driver):
                     job_details[field_name] = field_value
 
             jobDetails = {
-                "Job Id": job_details.get('Requisition ID', jobs.index(job)),
+                "Job Id": job_details.get('ID', jobs.index(job)),
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
                 "Job Type": job_details.get('Position Type', ''),
-                "Categories": "Medical Device",
+                "Categories": "Diagnostic",
                 "Location": Location,
                 "City": City,
                 "State": state,
@@ -130,13 +134,13 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "msh@mshbbraun.com",
+                "Employer Email": "msh@mshbruker.com",
                 "Full Name": "",
-                "Company Name": "B Braun",
-                "Employer Website": "https://bbrauncareers-bbraun.icims.com/",
+                "Company Name": "Bruker",
+                "Employer Website": " https://uscareers-bruker.icims.com/",
                 "Employer Phone": "",
-                "Employer Logo": "",
-                "Company Description": "The B. Braun Group of Companies leads in thoughtful solutions that address real issues in patient care and clinician safety. The global slogan, Sharing Expertise® fosters a teamwork approach to saving lives and solving the problems of the health care industry. It is an ethical and purposeful work culture that welcomes innovation and rewards progress.",
+                "Employer Logo": "https://uscareers-bruker.icims.com/jobs/search?ss=1&searchKeyword=sales",
+                "Company Description": "Bruker's differentiated high-value life science research and diagnostics solutions enable scientists to make breakthrough discoveries and develop new applications that improve the quality of human life",
             }
             JOBS.append(jobDetails)
 
@@ -150,11 +154,11 @@ def scraping():
     try:
         driver = configure_undetected_chrome_driver(True)
         driver.maximize_window()
-        url = "https://bbrauncareers-bbraun.icims.com/jobs/search?ss=1&searchKeyword=sales&searchRelation=keyword_all&searchLocation=12781--"
+        url = "https://uscareers-bruker.icims.com/jobs/search?ss=1&searchKeyword=sales"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
-            write_to_csv(Jobs, "data", "BBraun.csv")
+            write_to_csv(Jobs, "data", "Bruker.csv")
         except Exception as e:
             print(f"Error : {e}")
     except Exception as e:
