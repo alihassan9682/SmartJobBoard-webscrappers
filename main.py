@@ -2,6 +2,8 @@ import subprocess
 import os
 import sys
 
+from uploader import upload_files
+
 if getattr(sys, 'frozen', False):
     current_dir = sys._MEIPASS
 else:
@@ -69,11 +71,21 @@ def run_scraper(scraper):
         return False
 
 def main():
+    all_successful = True
     for scraper in scrapers:
-        success = run_scraper(scraper)
-        if not success:
-            print(f"Stopping execution. {scraper} failed.")
+        try:
+            success = run_scraper(scraper)
+            if not success:
+                print(f"Stopping execution. {scraper} failed.")
+                all_successful = False
+                break
+        except Exception as e:
+            print(f"Exception occurred while running {scraper}: {e}")
+            all_successful = False
             break
+
+    if all_successful:
+        upload_files()
 
 if __name__ == "__main__":
     main()
