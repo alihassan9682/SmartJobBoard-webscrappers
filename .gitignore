@@ -136,3 +136,6 @@ cython_debug/
 # Windows
 Thumbs.db
 ehthumbs.db
+
+# CSV files
+*.csv
