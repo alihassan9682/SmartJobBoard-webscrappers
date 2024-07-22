@@ -2,7 +2,7 @@ import subprocess
 import os
 import sys
 
-from uploader import upload_files
+from uploader import upload_file
 
 if getattr(sys, 'frozen', False):
     current_dir = sys._MEIPASS
@@ -10,10 +10,10 @@ else:
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
 scrapers = [
-    'Lantheus.py',
+    'Amgen.py',
+    'Tempus.py',
     'Abbott.py',
     'Abbvie.py',
-    'Amgen.py',
     'AstraZeneca.py',
     'Baxter.py',
     'BBraun.py',
@@ -59,33 +59,21 @@ scrapers = [
 
 def run_scraper(scraper):
     try:
-        # Construct full path to scraper script
         scraper_path = os.path.join(current_dir, scraper)
-        
-        # Run the scraper script
         result = subprocess.run(['python', scraper_path], check=True)
         print(f"{scraper} completed successfully.")
+        upload_file(f'{scraper.split(".")[0]}.csv')
         return True
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while running {scraper}: {e}")
         return False
 
 def main():
-    all_successful = True
     for scraper in scrapers:
         try:
-            success = run_scraper(scraper)
-            if not success:
-                print(f"Stopping execution. {scraper} failed.")
-                all_successful = False
-                break
+            run_scraper(scraper)
         except Exception as e:
             print(f"Exception occurred while running {scraper}: {e}")
-            all_successful = False
-            break
-
-    if all_successful:
-        upload_files()
 
 if __name__ == "__main__":
     main()

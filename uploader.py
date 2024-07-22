@@ -6,7 +6,7 @@ import time
 
 from helpers import configure_webdriver
 
-def upload_files():
+def upload_file(csv_filename):
     driver = configure_webdriver(True)
 
     try:
@@ -21,19 +21,22 @@ def upload_files():
 
         time.sleep(5)
 
+        driver.get("https://medsaleshub.mysmartjobboard.com/admin/jobs/import/")
+        file_path = os.path.join('data', csv_filename)
+        absolute_file_path = os.path.abspath(file_path)
+        if os.path.exists(absolute_file_path):
+            file_input = driver.find_element(By.NAME, "import_file")
+            file_input.send_keys(absolute_file_path)
+            time.sleep(2)
+            upload_button = driver.find_element(By.ID, "run-import")
+            upload_button.click()
+            time.sleep(2)
+            upload_button = driver.find_element(By.ID, "run-import")
+            upload_button.click()
+            time.sleep(5)
+            print(f"File '{csv_filename}' uploaded successfully.")
+        else:
+            print(f"File '{csv_filename}' not found.")
 
-        data_folder = 'data'
-        for filename in os.listdir(data_folder):
-            driver.get("https://medsaleshub.mysmartjobboard.com/admin/jobs/import/")
-            if filename.endswith(".csv"):
-                file_path = os.path.join(data_folder, filename)
-                absolute_file_path = os.path.abspath(file_path)
-                file_input = driver.find_element(By.NAME, "import_file")
-                file_input.send_keys(absolute_file_path)
-                upload_button = driver.find_element(By.ID, "run-import")
-                upload_button.click()
-                time.sleep(5)
-
-        print("All files uploaded successfully.")
     finally:
         driver.quit()

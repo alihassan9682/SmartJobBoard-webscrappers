@@ -54,7 +54,7 @@ def loadAllJobs(driver):
         print('total jobs', len(jobs))
         try:
             JOBS = JOBS + jobs
-            print('HOBS', len(JOBS))
+            print('JOBS', len(JOBS))
             next_button = wait.until(
                 EC.presence_of_element_located((By.XPATH, "//button[@class='pagination-page-jump']/following-sibling::a[1][contains(@class, 'next')]"))
             )
@@ -87,7 +87,7 @@ def getJobs(driver):
             desc_content = soup.find("div", class_="ats-description")
             jobDescription = desc_content.prettify()
             location_meta = soup.find("span", class_="job-location__small job-info")
-            print('i am location', location_meta)
+            # print('i am location', location_meta)
             City = state = job_type = Location =''
             country = 'US'
 
@@ -115,7 +115,7 @@ def getJobs(driver):
             if additional_locations_span:
                 additional_locations_text = additional_locations_span.get_text(separator=" ").split("ADDITIONAL LOCATIONS: ")[1].strip()
                 additional_locations = additional_locations_text.split("; ")
-                print("Additional Locations:", additional_locations)
+                # print("Additional Locations:", additional_locations)
                 locations =  [loc for loc in additional_locations if "US" in loc]
                 if locations:
                     if Location:
@@ -145,16 +145,16 @@ def getJobs(driver):
                 to_salary = to_salary.strip()
             else:
                 from_salary = to_salary = ""
-            print("Job", job_type)
-            print("Location", Location)
-            print("Posted Date", posted_date)
-            print("Salary Range", salary_range,from_salary,to_salary)
-            print("Job Id", job_id)
-            print("Job Title", jobTitle)
-            print("city", City)
-            print("state", state)
-            print("country", country)
-            print('remote', is_remote(Location))
+            # print("Job", job_type)
+            # print("Location", Location)
+            # print("Posted Date", posted_date)
+            # print("Salary Range", salary_range,from_salary,to_salary)
+            # print("Job Id", job_id)
+            # print("Job Title", jobTitle)
+            # print("city", City)
+            # print("state", state)
+            # print("country", country)
+            # print('remote', is_remote(Location))
             jobDetails = {
                 "Job Id": job_id,
                 "Job Title": jobTitle,
