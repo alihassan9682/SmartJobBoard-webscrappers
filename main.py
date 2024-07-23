@@ -11,6 +11,7 @@ else:
 
 scrapers = [
     'Amgen.py',
+    'Lantheus.py',
     'Tempus.py',
     'Abbott.py',
     'Abbvie.py',
