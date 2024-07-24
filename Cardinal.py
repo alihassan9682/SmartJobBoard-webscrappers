@@ -125,31 +125,25 @@ def getJobs(driver):
             if details_ul:
                 details_li = details_ul.find_all("li")
                 for li in details_li:
-                    label = li.find("span", class_="details-label").text.strip(": ")
+                    label = li.find("span", class_="details-label").text.strip(": \n")
                     data_span = li.find("span", class_="details-data")
                     if data_span:
                         data = ''.join([span.text for span in data_span.find_all("span")]) or data_span.text.strip()
                     else:
                         data = ''
                     job_details[label] = data
-
-            Location = job_details.get('Location', '')
-            locations = []
             City = ''
             state = ''
-            country = job_details.get('Country', 'United States')  # Default to United States if country is not listed
             Zipcode = ''
+            Location = job_details.get('Location', '')
+            country = job_details.get('Country', 'United States')
+            print('Extracted Location:', Location)
 
+            City, state = '', ''
             if Location:
-                location_spans = details_ul.find("span", class_="details-data").find_all("span")
-                locations = [span.text for span in location_spans]
-                if locations:
-                    Location = ', '.join(locations)
-                    last_location = locations[-1]
-                    if ',' in last_location:
-                        city_state = last_location.split(',')
-                        City = city_state[0].strip()
-                        state = city_state[1].strip()
+                parts = Location.split(', ')
+                if len(parts) == 2:
+                    City, state = parts
 
             jobDetails = {
                 "Job Id": jobs.index(job),
