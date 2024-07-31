@@ -175,6 +175,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "",
                 "Company Description": "",
+                "Active": "Active",
             }
             JOBS.append(jobDetails)
 
