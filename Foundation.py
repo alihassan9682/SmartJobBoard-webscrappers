@@ -97,10 +97,7 @@ def getJobs(driver):
             City = ', '.join(city_list) if city_list else ''
             state = ', '.join(state_list) if state_list else ''
             Zipcode = ''
-            print("Job Title", jobTitle)
-            print("city", City)
-            print("state", state)
-            print("country", country)
+
             jobDetails = {
                 "Job Id": jobs.index(job),
                 "Job Title": jobTitle,

@@ -58,7 +58,6 @@ def loadAllJobs(driver):
             ]
             try:
                 JOBS = JOBS + jobs
-                print('total jobs', len(JOBS))
                 next = driver.find_element(
                     By.CSS_SELECTOR, "[data-ph-at-id = 'pagination-next-link']"
                 ).get_attribute("href")

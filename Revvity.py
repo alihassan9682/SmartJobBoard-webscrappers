@@ -50,7 +50,7 @@ def loadAllJobs(driver):
                 )
             for job in jobs
         ]
-        print('total jobs', len(jobs))
+
         try:
             JOBS = JOBS + jobs
             print('HOBS', len(JOBS))
@@ -94,8 +94,7 @@ def getJobs(driver):
             Location = location_meta.text if location_meta else ''
             country = 'United States'
             Zipcode = ''
-            print("Location", Location)
-            print("Job Title", jobTitle)
+
             print('remote', is_remote(Location))
             jobDetails = {
                 "Job Id": job_id,

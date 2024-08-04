@@ -153,7 +153,7 @@ def getJobs(driver):
 
 def scraping():
     try:
-        driver = configure_undetected_chrome_driver(True)
+        driver = configure_webdriver(True)
         driver.maximize_window()
         url = "https://uscareers-bruker.icims.com/jobs/search?ss=1&searchKeyword=sales"
         try:

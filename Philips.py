@@ -72,7 +72,7 @@ def loadAllJobs(driver):
             ]
             try:
                 JOBS = JOBS + jobs
-                print('total jobs', len(JOBS))
+        
                 next_button = driver.find_element(By.CSS_SELECTOR, "[data-ph-at-id = 'pagination-next-link']")
                 if 'aurelia-hide' in next_button.get_attribute('class'):
                     print('No more pages', len(JOBS))

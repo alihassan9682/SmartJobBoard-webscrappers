@@ -50,7 +50,7 @@ def loadAllJobs(driver):
                 )
             for job in jobs
         ]
-        print('total jobs', len(jobs))
+
         try:
             JOBS = JOBS + jobs
             print('HOBS', len(JOBS))
@@ -92,12 +92,7 @@ def getJobs(driver):
             country = 'Unites States'
 
             Zipcode = ''
-            print("Posted Date", posted_date)
-            print("Job Id", job_id)
-            print("Job Title", jobTitle)
-            print("city", City)
-            print("state", state)
-            print("country", country)
+
             jobDetails = {
                 "Job Id": job_id,
                 "Job Title": jobTitle,

@@ -60,7 +60,6 @@ def loadAllJobs(driver):
 
     for row in job_rows:
         onclick_attr = row.get_attribute("onclick")
-        print("onclick: %s" % onclick_attr)
         if onclick_attr:
             url_start = onclick_attr.find("window.open(&quot;") + len("window.open(&quot;")
             url_end = onclick_attr.find("&quot;);")
@@ -157,7 +156,7 @@ def getJobs(driver):
 
 def scraping():
     try:
-        driver = configure_undetected_chrome_driver(True)
+        driver = configure_webdriver(True)
         driver.maximize_window()
         url = " https://guardanthealth.com/careers/jobs/"
         try:

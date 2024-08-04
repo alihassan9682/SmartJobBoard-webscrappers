@@ -1,6 +1,6 @@
 import time
 import random
-from helpers import configure_undetected_chrome_driver, is_remote
+from helpers import configure_undetected_chrome_driver, configure_webdriver, is_remote
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -44,7 +44,7 @@ def loadAllJobs(driver):
                 )
             for job in jobs
         ]
-        print('total jobs', len(jobs))
+
         try:
             JOBS = JOBS + jobs
             print('HOBS', len(JOBS))
@@ -91,12 +91,7 @@ def getJobs(driver):
             City = state = job_type = Location =''
             country = 'United States'
             Zipcode = ''
-            print("Job", jobDescription)
-            print("Location", Location)
-            print("Job Title", jobTitle)
-            print("city", City)
-            print("state", state)
-            print("country", country)
+
             print('remote', is_remote(Location))
             jobDetails = {
                 "Job Id": jobs.index(job),
@@ -138,7 +133,7 @@ def getJobs(driver):
 
 def scraping():
     try:
-        driver = configure_undetected_chrome_driver(True)
+        driver = configure_webdriver(True)
         driver.maximize_window()
         url = " https://careers.biomerieux.com/search/jobs/in/country/united-states?q=sales"
         try:

@@ -50,7 +50,6 @@ def loadAllJobs(driver):
                 if job not in unique_jobs:
                     unique_jobs.add(job)
                     JOBS.append(job)
-            print('total jobs', len(JOBS))
             next_page_number = current_page + 1
             next_page_elements = driver.find_elements(By.CSS_SELECTOR, f"a[href='javascript:pagination({next_page_number})']")
             
@@ -110,16 +109,6 @@ def getJobs(driver):
                 from_salary, to_salary = salary_range.split('-', 1)
                 from_salary = from_salary.strip()
                 to_salary = to_salary.strip()
-
-            print('salary_range', from_salary, to_salary)
-            print('loc',Location)
-            print('job_type',job_type)
-            print('job_id',job_id)
-            print('jobTitle',jobTitle)
-            print('desc_content',desc_content)
-            print('salary_range',salary_range)
-            print('City',City)
-            print('state',state)
 
             jobDescription = desc_content.prettify()
 

@@ -138,7 +138,7 @@ def getJobs(driver):
 
 def scraping():
     try:
-        driver = configure_undetected_chrome_driver(True)
+        driver = configure_webdriver(True)
         driver.maximize_window()
         url = "https://careers.eurofins.com/us/jobs/?keywords=sales&countryId=us"
         try:

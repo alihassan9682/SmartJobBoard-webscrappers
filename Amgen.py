@@ -51,7 +51,7 @@ def loadAllJobs(driver):
                 )
             for job in jobs
         ]
-        print('total jobs', len(jobs))
+
         try:
             JOBS = JOBS + jobs
             print('JOBS', len(JOBS))
@@ -145,16 +145,7 @@ def getJobs(driver):
                 to_salary = to_salary.strip()
             else:
                 from_salary = to_salary = ""
-            # print("Job", job_type)
-            # print("Location", Location)
-            # print("Posted Date", posted_date)
-            # print("Salary Range", salary_range,from_salary,to_salary)
-            # print("Job Id", job_id)
-            # print("Job Title", jobTitle)
-            # print("city", City)
-            # print("state", state)
-            # print("country", country)
-            # print('remote', is_remote(Location))
+
             jobDetails = {
                 "Job Id": job_id,
                 "Job Title": jobTitle,

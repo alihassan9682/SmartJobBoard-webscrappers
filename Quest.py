@@ -50,7 +50,7 @@ def loadAllJobs(driver):
                 )
             for job in jobs
         ]
-        print('total jobs', len(jobs))
+
         try:
             JOBS = JOBS + jobs
             print('HOBS', len(JOBS))
@@ -99,13 +99,7 @@ def getJobs(driver):
                 state = location_parts[1].strip()
 
             Zipcode = ''
-            print("Job", job_type)
-            print("Location", Location)
-            print("Job Title", jobTitle)
-            print("city", City)
-            print("state", state)
-            print("country", country)
-            print('remote', is_remote(Location))
+
             jobDetails = {
                 "Job Id": jobs.index(job),
                 "Job Title": jobTitle,
