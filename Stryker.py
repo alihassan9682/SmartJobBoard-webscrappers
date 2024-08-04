@@ -194,7 +194,7 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://careers.stryker.com/job-search-results/?keyword=Sales%20Representative&fuzzy=false&location=United%20States&country=US&radius=25"
+        url = "https://careers.stryker.com/jobs?keyword=Sales&location_name=United%20States&location_type=4"
         try:
             driver.get(url)
             Jobs = getJobs(driver)

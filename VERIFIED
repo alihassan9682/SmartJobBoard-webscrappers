@@ -5,4 +5,12 @@
 #3. Pfizer
 #4. Zimmer
 #5. ThermoFisher
-#6. ThermoFisher
+#6. Takeda
+#7. Sotera
+#7. Sotera
+
+##Following files have links issues or unable to scrap now
+#1. Stryker link updated but the scraper needs to be updated completely.
+#2. Siemens classes are changed maybe
+#3. Sanofi classes are changed maybe
+#3. Roche classes are changed maybe
