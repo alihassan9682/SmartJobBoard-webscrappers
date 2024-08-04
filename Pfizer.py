@@ -181,6 +181,7 @@ def getJobs(driver):
                 "Employer Phone": "1-800-879-3477",
                 "Employer Logo": "",
                 "Company Description": "We’re in relentless pursuit of breakthroughs that change patients’ lives. We innovate every day to make the world a healthier place. It was Charles Pfizer’s vision at the beginning and it holds true today.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

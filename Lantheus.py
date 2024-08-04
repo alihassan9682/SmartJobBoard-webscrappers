@@ -124,6 +124,7 @@ def getJobs(driver):
                     "Employer Phone": "",
                     "Employer Logo": "https://recruiting.ultipro.com/LAN1018LMII/JobBoar…-bbd1-406f-8a87-e66bccf06598&m=637897818732430000",
                     "Company Description": "We are the leading radiopharmaceutical-focused company with proven expertise in developing, manufacturing, and commercializing pioneering diagnostic and therapeutic products and artificial intelligence (AI) solutions",
+                    "Status": "Active",
                 }
                 JOBS.append(jobDetails)
 

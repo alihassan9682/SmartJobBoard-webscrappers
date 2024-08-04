@@ -84,6 +84,7 @@ def getJobs(driver):
                 "Employer Phone": "1-888-659-6787",
                 "Employer Logo": "",
                 "Company Description": "Olympus, a leading medical technology company, has focused on making people’s lives better for over 100 years Our Purpose is to make people’s lives healthier, safer, and more fulfilling.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
             driver.close()

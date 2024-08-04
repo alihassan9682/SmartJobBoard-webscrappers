@@ -153,6 +153,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://attraxcdnprod1-freshed3dgayb7c3.z01.azurefd.net/1481171/538548f1-243c-40ff-96ed-610a25cc1a3f/2023.17000.1938/Blob/img/logo.svg",
                 "Company Description": "AbbVie discovers and delivers innovative medicines and solutions that enhance people’s lives.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
         except Exception as e:

@@ -113,6 +113,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://us.gsk.com/assets/img/gif_logo_opt.gif",
                 "Company Description": "We are a focused biopharma company. We prevent and treat disease with vaccines, specialty and general medicines. We focus on the science of the immune system and ​advanced technologies, investing in four core ​therapeutic areas (infectious diseases, HIV, ​respiratory/immunology and oncology). Our ​Ahead Together strategy means intervening ​early to prevent and change the course of ​disease, helping to protect people and ​support healthcare systems.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

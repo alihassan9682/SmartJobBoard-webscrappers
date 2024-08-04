@@ -157,6 +157,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://tbcdn.talentbrew.com/company/7684/v2_0/img/icons/az-logo.svg",
                 "Company Description": "We are AstraZeneca, one of the world’s most forward-thinking and connected BioPharmaceutical companies. With a strong purpose, an even stronger bond between each of our people and a science-led, patient-first attitude, we’re changing the future of medicine and the impact it can have on lives across the globe.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

@@ -136,6 +136,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://tbcdn.talentbrew.com/company/38852/gst-v1_0/img/logos/logo-quest-diagnostics.svg",
                 "Company Description": "At Quest Diagnostics, our goal is to provide our customers exceptional service that builds long-term value into the future and promotes a healthier world. It’s not just caring for our customers that makes our workplace so inspiring. It’s our dedication to driving your career forward and taking care of the whole you. With opportunities to thrive, learn, and grow your career, you’ll discover more ways to transform professionally and personally than you ever thought possible.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

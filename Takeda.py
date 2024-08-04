@@ -126,6 +126,7 @@ def getJobs(driver):
                 "Employer Phone": "+81-3-3278-2111",
                 "Employer Logo": "https://tbcdn.talentbrew.com/company/1113/gst_v2_0/img/logo.svg",
                 "Company Description": "As Takeda employees, our decisions and actions can affect people’s lives. This is a noble purpose that demands the highest standards of ethical behavior. Every day, we draw on Takeda’s values and priorities of Patient-Trust-Reputation-Business to ensure we do what’s right – for our patients, each other and society – and remain true to Takeda’s mission.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
         except Exception as e:

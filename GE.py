@@ -163,6 +163,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://cdn.phenompeople.com/CareerConnectResources/GEVGHLGLOBAL/images/1694706045469_GE-HLTHCR_Standard_RGB-CompPrpl1-1674000514001.png",
                 "Company Description": "GE HealthCare does NOT request payment associated with career opportunities at any point during the process. If you have provided personal information, such as a credit card number, to someone posing as a GE HealthCare talent acquisition partner, please report the details to your local authorities immediately.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

@@ -177,6 +177,7 @@ def getJobs(driver):
                 "Employer Phone": "+45 4444 8888",
                 "Employer Logo": "",
                 "Company Description": "We are a global healthcare company, founded in 1923 and headquartered just outside Copenhagen, Denmark.Our purpose is to drive change to defeat serious chronic diseases, built upon our heritage in diabetes. We do so by pioneering scientific breakthroughs, expanding access to our medicines and working to prevent and ultimately cure the diseases we treat.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

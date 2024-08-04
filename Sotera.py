@@ -116,6 +116,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://soterahealth.com/wp-content/uploads/2023/05/careers-logo.png",
                 "Company Description": "Sotera Health is driven by its mission, Safeguarding Global Health®. Along with our three best-in-class businesses – Sterigenics®, Nordion® and Nelson Labs® – we are a leading global provider of mission-critical end-to-end sterilization solutions and lab testing and advisory services for the healthcare industry.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

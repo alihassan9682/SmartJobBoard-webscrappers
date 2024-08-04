@@ -141,6 +141,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://uscareers-bruker.icims.com/jobs/search?ss=1&searchKeyword=sales",
                 "Company Description": "Bruker's differentiated high-value life science research and diagnostics solutions enable scientists to make breakthrough discoveries and develop new applications that improve the quality of human life",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

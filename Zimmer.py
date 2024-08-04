@@ -149,6 +149,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://cdn.phenompeople.com/CareerConnectResources/ZBUZBRUS/images/svgexport-2-1683122671945.svg",
                 "Company Description": "At Zimmer Biomet, we have a shared commitment to our patients, customers and one another.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

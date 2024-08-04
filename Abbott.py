@@ -146,6 +146,7 @@ def getJobs(driver):
                 "Employer Phone": "(224) 667-6100",
                 "Employer Logo": "https://cdn.phenompeople.com/CareerConnectResources/ABLAUS/images/abbott-Logo-1664276039945.png",
                 "Company Description": "From removing the regular pain of fingersticks as people manage their diabetes to connecting patients to doctors with real-time information monitoring their hearts, from easing chronic pain and movement disorders to testing half the world’s blood donations to ensure a healthy supply, our purpose is to make the world a better place by bringing life-changing health technologies to the people who need them. That’s our commitment to helping you live your best life.",
+                "Status": "Active"
             }
             JOBS.append(jobDetails)
 

@@ -131,6 +131,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://files.clinchtalent.com/foundation-medicine…503f1be2ea7611d2d34a5d746b33d4/Logos/fmi-logo.png",
                 "Company Description": "Foundation Medicine began with an idea—to simplify the complex nature of cancer genomics, bringing cutting-edge science and technology to everyday cancer care. Our approach generates insights that help doctors match patients to more treatment options and helps accelerate the development of new therapies. Foundation Medicine is the culmination of talented people coming together to realize an important vision, and the work we do every day impacts real lives.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

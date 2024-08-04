@@ -123,6 +123,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://static.vscdn.net/images/careers/demo/modernatx-sandbox/1646929253::MB033L-T.png",
                 "Company Description": "Moderna Is An Equal Opportunity Employer And Makes Employment Decisions Without Regard To Race, Color, Religion, Sex, Sexual Orientation, Gender Identity, National Origin, Age, Protected Veteran Status, Disability Status, Or Any Other Status Protected By Law.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

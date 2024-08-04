@@ -162,6 +162,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://medline.taleo.net/careersection/theme/321/1707193440000/en/theme/images/medline-header.png",
                 "Company Description": "We create partnerships that last by bringing the best ideas forward. Our entrepreneurial culture, along with our experience as a clinical leader and supply chain expert, inspires a “can-do” attitude, allowing us to act quickly and choose the right products and solutions so you can provide the best care.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

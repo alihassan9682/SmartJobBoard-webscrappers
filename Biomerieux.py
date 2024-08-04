@@ -128,6 +128,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://careers.biomerieux.com/system/production/assets/264009/original/BioMerieux_logo.svg?s=88b891f56bb5e320",
                 "Company Description": "Choosing bioMérieux means joining a people-centered, stimulating work environment where teams unleash their full potential and are empowered to dare change the game for public health.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

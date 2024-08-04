@@ -114,6 +114,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://www.natera.com/wp-content/themes/natera/assets/images/logo.svg",
                 "Company Description": "Natera™ is a global leader in cell-free DNA (cfDNA) testing, dedicated to oncology, women’s health, and organ health. We aim to make personalized genetic testing and diagnostics part of the standard of care to protect health and inform earlier, more targeted interventions that help lead to longer, healthier lives.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

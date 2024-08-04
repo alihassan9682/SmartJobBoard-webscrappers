@@ -182,6 +182,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "",
                 "Company Description": "",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

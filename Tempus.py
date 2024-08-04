@@ -112,6 +112,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://www.tempus.com/wp-content/themes/tempus-theme/dist/images/tempus_black.svg",
                 "Company Description": "We’re building innovative tech solutions oriented around clinical care and research products—and the virtuous cycle between them.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

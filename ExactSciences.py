@@ -187,6 +187,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://exactsciences.wd1.myworkdayjobs.com/Exact_Sciences/assets/logo",
                 "Company Description": "We are Exact Sciences, and we're changing lives together through earlier detection and smarter answers.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

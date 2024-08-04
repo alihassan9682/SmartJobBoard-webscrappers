@@ -149,6 +149,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "",
                 "Company Description": "We focus on finding new medicines and diagnostics and utilising data-based insights to evolve the practice of medicine and help patients live longer, better lives.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

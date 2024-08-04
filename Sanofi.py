@@ -131,6 +131,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "",
                 "Company Description": "We are an innovative global healthcare company with one purpose: to chase the miracles of science to improve people’s lives",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

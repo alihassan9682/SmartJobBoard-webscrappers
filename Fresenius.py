@@ -145,6 +145,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://tbcdn.talentbrew.com/company/488/full_v1_0-gst/img/logo-blue-0033a0.png",
                 "Company Description": "We're the largest provider of renal care products and services in the nation, including state-of-the-art dialysis machines, dialyzers and pharmaceuticals, and we are home to the country's largest renal specialty laboratories. We supply unsurpassed personalized dialysis care services including hemodialysis, home dialysis and transplant support services, and in-center services.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

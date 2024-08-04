@@ -161,6 +161,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://static.vscdn.net/images/careers/demo/bostonscientific-sandbox/1681242661::BSC_wtag_541blue_rgb.jpg",
                 "Company Description": "Work. Life. Family. It can be a lot. We offer a variety of resources to support you in your every day life.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

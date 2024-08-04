@@ -163,6 +163,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://static.vscdn.net/images/careers/demo/siemens/1677769995::Healthineers+Logo+2023",
                 "Company Description": "We pioneer breakthroughs in healthcare. For everyone. Everywhere. Sustainably.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

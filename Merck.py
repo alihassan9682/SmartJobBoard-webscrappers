@@ -111,6 +111,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "",
                 "Company Description": "We’re a global health care company working to deliver innovative health solutions through our medicines, vaccines, biologic therapies and animal health products. We’re focused on discovering new solutions for today and the future.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

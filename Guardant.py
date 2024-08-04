@@ -147,6 +147,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://guardanthealth.com/wp-content/uploads/GUARDANT_LOGO_RGB_2024.svg",
                 "Company Description": "Guardant Health is a leading precision oncology company focused on helping conquer cancer globally through use of its proprietary tests, vast data sets and advanced analytics. The Guardant Health oncology platform leverages capabilities to drive commercial adoption, improve patient clinical outcomes and lower healthcare costs across all stages of the cancer care continuum. Guardant Health has commercially launched Guardant360®, Guardant360 CDx, Guardant360 TissueNext™, Guardant360 Response™, and GuardantOMNI® tests for advanced stage cancer patients, and Guardant Reveal™ for early-stage cancer patients. The Guardant Health screening portfolio, including the Shield™ test, aims to address the needs of individuals eligible for cancer screening",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

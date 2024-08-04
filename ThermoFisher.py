@@ -154,6 +154,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://cdn.phenompeople.com/CareerConnectResources/TFSCGLOBAL/en_global/desktop/assets/images/header_logo.png",
                 "Company Description": "Thermo Fisher Scientific Inc. is the world leader in serving science, with annual revenue of more than $40 billion. Our Mission is to enable our customers to make the world healthier, cleaner and safer. Whether our customers are accelerating life sciences research, solving complex analytical challenges, increasing productivity in their laboratories, improving patient health through diagnostics or the development and manufacture of life-changing therapies, we are here to support them",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

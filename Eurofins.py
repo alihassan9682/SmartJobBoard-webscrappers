@@ -128,6 +128,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://c.smartrecruiters.com/sr-company-images-prod-aws-dc5/59a68830e4b02f57443071f7/8c61bb56-beca-4635-b558-78899fdad486/huge?r=s3-eu-central-1&_1694667983751",
                 "Company Description": "Eurofins Scientific is an international life sciences company, providing a unique range of analytical testing services to clients across multiple industries, to make life and our environment safer, healthier and more sustainable. From the food you eat, to the water you drink, to the medicines you rely on, Eurofins works with the biggest companies in the world to ensure the products they supply are safe, their ingredients are authentic and labelling is accurate.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

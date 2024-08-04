@@ -137,6 +137,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "",
                 "Company Description": "The B. Braun Group of Companies leads in thoughtful solutions that address real issues in patient care and clinician safety. The global slogan, Sharing Expertise® fosters a teamwork approach to saving lives and solving the problems of the health care industry. It is an ethical and purposeful work culture that welcomes innovation and rewards progress.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

@@ -131,6 +131,7 @@ def getJobs(driver):
                 "Employer Phone": "1-800-332-2056",
                 "Employer Logo": "",
                 "Company Description": "We are a global biopharmaceutical company whose mission is to discover, develop and deliver innovative medicines that help patients prevail over serious diseases.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

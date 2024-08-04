@@ -121,6 +121,7 @@ def getJobs(driver):
                 "Employer Phone": "+1 781-464-2000",
                 "Employer Logo": "https://www.biogen.com/content/dam/corporate/international/global/en-US/global/logos/biogen-logo-colour.svg",
                 "Company Description": "Biogen is a leading biotechnology company that pioneers innovative science to deliver new medicines to transform patients’ lives and to create value for shareholders and our communities.We apply deep understanding of human biology and leverage different modalities to advance first-in-class treatments or therapies that deliver superior outcomes. Our approach is to take bold risks, balanced with return on investment to deliver long-term growth.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

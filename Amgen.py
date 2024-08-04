@@ -185,6 +185,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://tbcdn.talentbrew.com/company/87/cms/logos/logo-amgen-lg.png",
                 "Company Description": "Amgen is an Equal Opportunity Employer and will consider all qualified applicants for employment without regard to race, color, religion, sex, sexual orientation, gender identity, national origin, protected veteran status or disability status.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

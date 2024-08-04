@@ -162,6 +162,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://tbcdn.talentbrew.com/company/152/v3_0/img/baxter_logo_blue.svg",
                 "Company Description": "As an innovative, global healthcare leader, Baxter offers advanced products, technologies and therapies that provide the support people need to lead healthier, longer lives.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

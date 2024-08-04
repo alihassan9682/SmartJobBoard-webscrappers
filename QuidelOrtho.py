@@ -186,6 +186,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://orthoclinical.wd1.myworkdayjobs.com/Search/assets/logo",
                 "Company Description": "QuidelOrtho unites the strengths of Quidel Corporation and Ortho Clinical Diagnostics, creating a world-leading in vitro diagnostics company with award-winning expertise in immunoassay and molecular testing, clinical chemistry and transfusion medicine. We are more than 6,000 strong and do business in over 130 countries, providing answers with fast, accurate and consistent testing where and when they are needed most – home to hospital, lab to clinic.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

@@ -149,6 +149,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://cdn.phenompeople.com/CareerConnectResources/DANAGLOBAL/images/Danaher_logo_h_tm_rgb-1696293771671.png",
                 "Company Description": "We’re Danaher - a leading global life sciences and diagnostics innovator, committed to accelerating the power of science and technology to improve human health.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

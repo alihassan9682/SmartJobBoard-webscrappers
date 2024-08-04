@@ -161,6 +161,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://static.vscdn.net/images/careers/demo/medtronic-sandbox/main_logo_tagline",
                 "Company Description": "As we engineer breakthrough medical discoveries, we develop new ways to enable the world to access them.Diversity fuels the innovation behind our life-saving technologies.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

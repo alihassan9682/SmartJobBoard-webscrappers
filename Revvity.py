@@ -127,6 +127,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://tbcdn.talentbrew.com/company/20539/v3_0/img/revvity-animated-logo.gif",
                 "Company Description": "Impossible is inspiration.If they say “impossible,” we say “challenge accepted.” At Revvity, we fearlessly face tomorrow’s unknowns for a healthier humankind.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

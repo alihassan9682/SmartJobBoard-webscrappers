@@ -174,6 +174,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "https://cdn.phenompeople.com/CareerConnectResources/PHILUS/images/Shape_@1-1691556561500.png",
                 "Company Description": "We're a health technology company driven by a passion for improving lives through technology.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 

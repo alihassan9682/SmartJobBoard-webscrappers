@@ -142,6 +142,7 @@ def getJobs(driver):
                 "Employer Phone": "",
                 "Employer Logo": "",
                 "Company Description": "Our commitment to patients extends well beyond our labs. We are proud to support the communities we serve, to embrace a culture and business model of patients over profits and to hold the highest ethical standards when it comes to patient well-being.",
+                "Status": "Active",
             }
             JOBS.append(jobDetails)
 
