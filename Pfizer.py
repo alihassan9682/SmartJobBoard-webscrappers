@@ -79,7 +79,6 @@ def loadAllJobs(driver):
                 job.find_element(By.TAG_NAME, "a").get_attribute("href")
                 for job in jobs
             ]
-            print('tital', len(jobs))
             try:
                 JOBS = JOBS + jobs
         
@@ -142,14 +141,6 @@ def getJobs(driver):
             posting_date = soup.select_one('.posted-date').get_text(strip=True) if soup.select_one('.posted-date') else ''
 
             job_id = soup.select_one('.job-id').get_text(strip=True) if soup.select_one('.job-id') else str(jobs.index(job))
-
-            print('Job', job_id)
-            print('Job Title', jobTitle)
-            print('Job Type', job_type)
-            print('Location', location)
-            print('City', city)
-            print('State', state)
-            print('Country', country)
 
             jobDetails = {
                 "Job Id": job_id,

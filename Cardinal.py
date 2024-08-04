@@ -137,7 +137,6 @@ def getJobs(driver):
             Zipcode = ''
             Location = job_details.get('Location', '')
             country = job_details.get('Country', 'United States')
-            print('Extracted Location:', Location)
 
             City, state = '', ''
             if Location:

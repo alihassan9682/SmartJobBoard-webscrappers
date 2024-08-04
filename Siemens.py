@@ -75,7 +75,7 @@ def loadAllJobs(driver):
                 if job_url not in unique_jobs:
                     unique_jobs.add(job_url)
                     JOBS.append(job_url)
-                    print('total', len(JOBS))
+    
                     
             except StaleElementReferenceException as e:
                 print(f"StaleElementReferenceException encountered: {e}")
@@ -120,15 +120,10 @@ def getJobs(driver):
             jobDescription = desc_content.prettify() if desc_content else ''
 
             selected_card = soup.find("div", class_='card-selected')
-            print('selected card', selected_card)
             location_meta = selected_card.find("p", class_='position-location')
-            print('location_meta',location_meta)
             remote_meta = selected_card.find("p", class_='label_g_1gGNB small_E4otQdF')
-            print('remote_meta',remote_meta)
             Location_detail = location_meta.text if location_meta else ''
-            print('Location_detail',Location_detail)
             Location = Location_detail.split('and')[0] if 'and' in Location_detail else Location_detail
-            print('Location',Location)
             City, state, country = get_location_details(Location_detail)
             country = 'United States'
             Zipcode = ''

@@ -62,7 +62,7 @@ def loadAllJobs(driver):
             ]
             try:
                 JOBS = JOBS + jobs
-                print('total', len(JOBS))
+
                 next = driver.find_element(
                     By.CSS_SELECTOR, "[data-ph-at-id='pagination-next-link']"
                 ).get_attribute("href")
@@ -109,16 +109,13 @@ def getJobs(driver):
                     if locations:
                         location = ', '.join(locations)
                         city = ', '.join([loc.split(',')[0].strip() for loc in locations if loc[0]])
-                        print('city', city)
                         state = ', '.join([loc.split(',')[1].strip() for loc in locations if loc[1]])
                         country = 'United States of America'
                 else:
                     print('issue with the location')
             except:
                 pass
-            print('location', location)
-            print('city',city)
-            print('state', state)
+
             Zipcode = ''
             date_posted = soup.find('div', class_='job-info au-target')['data-ph-at-job-post-date-text']
             job_type = soup.find('div', class_='job-info au-target')['data-ph-at-job-type-text']

@@ -44,7 +44,6 @@ def loadAllJobs(driver):
             jobs = WebDriverWait(results, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "multiline-data-container")))
             job_links = [job.find_element(By.TAG_NAME, "a").get_attribute("href") for job in jobs]
             JOBS.extend(job_links)
-            print('Total jobs loaded:', len(JOBS))
 
             try:
                 load_more_button = driver.find_element(By.ID, "next")
@@ -77,7 +76,6 @@ def getJobs(driver):
             time.sleep(2)
             job_meta = driver.find_element(By.ID, "requisitionDescriptionInterface.reqTitleLinkAction.row1")
             jobTitle = job_meta.text if job_meta else ''
-            print('job title',  jobTitle)
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="mastercontentpanel3")
@@ -85,24 +83,19 @@ def getJobs(driver):
             jobDescription = desc.prettify() if desc else ''
             City = state = country = ''
             P_Location = driver.find_element(By.ID, "requisitionDescriptionInterface.ID1511.row1")
-            print('P_Location', P_Location)
             if P_Location:
                 Location = P_Location.text
                 parts = Location.split('-')
-                print('11')
                 if len(parts) == 3 or len(parts) == 4:
                     state = parts[1]
                     City = parts[2]
-                    print('22')
                     
                 else:
                     City = state = ''
                 country = 'United States'
             try:
                 location_meta = driver.find_element(By.ID, "requisitionDescriptionInterface.ID1561.row1").text
-                print('33',location_meta)
                 if location_meta:
-                    print('44', location_meta)
                     
                     Location += location_meta
                     locations = location_meta.split(',')

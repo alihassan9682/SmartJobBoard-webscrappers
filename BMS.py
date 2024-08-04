@@ -52,7 +52,7 @@ def loadAllJobs(driver):
                 if job_url not in unique_jobs:
                     unique_jobs.add(job_url)
                     JOBS.append(job_url)
-                    print('total', len(JOBS))
+    
             except Exception as e:
                 print(f"Error processing job card: {e}")
 

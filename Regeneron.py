@@ -104,7 +104,6 @@ def getJobs(driver):
             job_meta = soup.find('ul', class_='job-meta')
 
             function_li = job_meta.find_all('li')
-            print('function lis', function_li[0].text.strip(), function_li[2].text.strip())
             remote_status, cities, states, Country = extract_location_details(function_li[0].text.strip())
             Location = function_li[0].text.strip()
             City = cities

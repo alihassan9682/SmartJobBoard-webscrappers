@@ -46,7 +46,7 @@ def loadAllJobs(driver):
 
         try:
             JOBS = JOBS + jobs
-            print('HOBS', len(JOBS))
+
             next_button = wait.until(
                 EC.presence_of_element_located((By.XPATH, "//li[@class='pagination-li']/a[@aria-label='Go to the next page of results.']"))
             )

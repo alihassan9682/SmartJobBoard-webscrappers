@@ -44,7 +44,6 @@ def loadAllJobs(driver):
         ]
         try:
             JOBS = JOBS + jobs
-            print('hahaha',len(JOBS))
             load_more_button = driver.find_element(By.CLASS_NAME, "mat-paginator-navigation-next")
             if 'mat-button-disabled' in load_more_button.get_attribute("class"):
                 print("Next button is disabled. Exiting the loop.")

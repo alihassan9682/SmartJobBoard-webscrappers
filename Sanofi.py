@@ -84,17 +84,13 @@ def getJobs(driver):
             desc_content = soup.find("div", class_="ats-description")
             jobDescription = desc_content.prettify()
             Location = driver.find_element(By.CLASS_NAME, "job-location").text
-            print('Location',Location)
             location_meta = Location.split(';') if ';' in Location else [Location]
-            print('location_meta',location_meta)
             cities = [loc.strip().split(',')[0].strip() if loc.strip() else '' for loc in location_meta]
             states = [loc.strip().split(',')[1].strip() if ',' in loc and len(loc.split(',')) > 1 else '' for loc in location_meta]
-            print('cities',cities)
-            print('states',states)
+
             city = ', '.join(cities) if cities else ''
             state = ', '.join(states) if states else ''
-            print('city',city)
-            print('state',state)
+
             country = 'United States'
             Zipcode = ''
             date_posted = soup.find('span', class_='job-date').text

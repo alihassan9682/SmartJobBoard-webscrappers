@@ -65,7 +65,7 @@ def loadAllJobs(driver):
         
                 next_button = driver.find_element(By.CLASS_NAME, "next-btn")
                 if 'aurelia-hide' in next_button.get_attribute('class'):
-                    print('No more pages', len(JOBS))
+                    print('No more pages')
                     break
                 else:
                     driver.execute_script("arguments[0].scrollIntoView(true);", next_button)

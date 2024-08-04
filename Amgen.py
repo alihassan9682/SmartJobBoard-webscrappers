@@ -54,8 +54,7 @@ def loadAllJobs(driver):
 
         try:
             JOBS = JOBS + jobs
-            print('JOBS', len(JOBS))
-            next_button = wait.until(
+                    next_button = wait.until(
                 EC.presence_of_element_located((By.XPATH, "//button[@class='pagination-page-jump']/following-sibling::a[1][contains(@class, 'next')]"))
             )
             
@@ -87,7 +86,6 @@ def getJobs(driver):
             desc_content = soup.find("div", class_="ats-description")
             jobDescription = desc_content.prettify()
             location_meta = soup.find("span", class_="job-location__small job-info")
-            # print('i am location', location_meta)
             City = state = job_type = Location =''
             country = 'US'
 

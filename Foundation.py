@@ -43,7 +43,7 @@ def loadAllJobs(driver):
             if job_url and job_url not in JOBS:
                 JOBS.append(job_url)
         try:
-            print('HOBS', len(JOBS))
+
             next_button = wait.until(
                 EC.presence_of_element_located((By.CLASS_NAME, "next"))
             )

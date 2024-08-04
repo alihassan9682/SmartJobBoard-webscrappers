@@ -55,8 +55,7 @@ def loadAllJobs(driver):
                 unique_jobs.add(job)
                 JOBS.append(job)
 
-        print('jobs', len(JOBS))
-
+    
         if len(JOBS) == prev_job_count:
             break
         prev_job_count = len(JOBS)

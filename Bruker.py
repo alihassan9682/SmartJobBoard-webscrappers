@@ -51,7 +51,6 @@ def loadAllJobs(driver):
 
             next_button = driver.find_elements(By.CSS_SELECTOR, ".iCIMS_Paging .glyph")[-1]
             if 'invisible' not in next_button.get_attribute('class'):
-                print('hello')
                 driver.execute_script("arguments[0].scrollIntoView();", next_button)
                 next_button.click()
                 time.sleep(2)
@@ -64,7 +63,6 @@ def loadAllJobs(driver):
         except Exception as e:
             print(f"An error occurred while loading jobs: {e}")
             break
-        print('total', len(JOBS))
         driver.switch_to.default_content()
 
     return JOBS

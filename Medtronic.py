@@ -70,7 +70,7 @@ def loadAllJobs(driver):
                 if job_url not in unique_jobs:
                     unique_jobs.add(job_url)
                     JOBS.append(job_url)
-                    print('total', len(JOBS))
+    
             except StaleElementReferenceException as e:
                 print(f"StaleElementReferenceException encountered: {e}")
                 time.sleep(1)

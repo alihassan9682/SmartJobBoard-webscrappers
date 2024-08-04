@@ -47,7 +47,7 @@ def loadAllJobs(driver):
 
         try:
             JOBS = JOBS + jobs
-            print('HOBS', len(JOBS))
+
             time.sleep(3)
             next_button = wait.until(
                 EC.presence_of_element_located((By.CLASS_NAME, "next_page"))
@@ -92,7 +92,6 @@ def getJobs(driver):
             country = 'United States'
             Zipcode = ''
 
-            print('remote', is_remote(Location))
             jobDetails = {
                 "Job Id": jobs.index(job),
                 "Job Title": jobTitle,

@@ -50,7 +50,7 @@ def loadAllJobs(driver):
 
         try:
             JOBS = JOBS + jobs
-            print('HOBS', len(JOBS))
+
             next_button = driver.find_element(By.CLASS_NAME, "next")
             if next_button and 'disabled' not in next_button.get_attribute('class'):
                 driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
@@ -108,7 +108,6 @@ def getJobs(driver):
             job_id_meta = soup.find('span',class_='job-referencee job-info')
             job_id = job_id_meta.text.replace("Job ID", "").strip() if job_id_meta else jobs.index(job)
 
-            print('remote', is_remote(jobTitle))
             jobDetails = {
                 "Job Id": job_id,
                 "Job Title": jobTitle,

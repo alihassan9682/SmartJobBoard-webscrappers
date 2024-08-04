@@ -69,7 +69,6 @@ def loadAllJobs(driver):
                 job_url = "http" + job_url
             JOBS.append(job_url)
     
-    print('jobs', len(JOBS))
 
     return JOBS
 
@@ -84,7 +83,6 @@ def getJobs(driver):
             soup = BeautifulSoup(page_source, "html.parser")
             title_meta = soup.find("h1", class_="job-title")
             jobTitle = title_meta.text if title_meta else ''
-            print('title', jobTitle)
             desc_content = soup.find('div', {'itemprop': 'description'})
             jobDescription = desc_content.prettify() if desc_content else ''
             job_details = {}
@@ -102,7 +100,6 @@ def getJobs(driver):
             location_meta = job_details.get('Formatted Address', '')
             Location = location_meta if location_meta else ''
             City = state = ''
-            print('location', Location)
             country = 'United States'
             if Location:
                 location_parts = Location.split(',')

@@ -62,7 +62,7 @@ def loadAllJobs(driver):
             ]
             try:
                 JOBS = JOBS + jobs
-                print('total', len(JOBS))
+
                 next = driver.find_element(
                     By.CLASS_NAME, "next-btn"
                 ).get_attribute("href")
