@@ -54,10 +54,10 @@ def loadAllJobs(driver):
 
         try:
             JOBS = JOBS + jobs
-                    next_button = wait.until(
-                EC.presence_of_element_located((By.XPATH, "//button[@class='pagination-page-jump']/following-sibling::a[1][contains(@class, 'next')]"))
-            )
-            
+            next_button = wait.until(
+            EC.presence_of_element_located((By.XPATH, "//button[@class='pagination-page-jump']/following-sibling::a[1][contains(@class, 'next')]"))
+        )
+        
             if next_button:
                 actions = ActionChains(driver)
                 actions.move_to_element(next_button).click().perform()

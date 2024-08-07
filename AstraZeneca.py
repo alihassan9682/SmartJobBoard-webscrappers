@@ -9,8 +9,10 @@ import os
 
 from helpers import configure_webdriver, is_remote
 
+
 def request_url(driver, url):
     driver.get(url)
+
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -23,48 +25,51 @@ def write_to_csv(data, directory, filename):
         for item in data:
             writer.writerow(item)
 
+
 def loadAllJobs(driver):
     JOBS = []
     wait = WebDriverWait(driver, 10)
-    
-    # Handle the alert close button
+
     try:
-        close = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "wscrOk2")))
+        close = wait.until(EC.presence_of_element_located(
+            (By.CLASS_NAME, "wscrOk2")))
         close.click()
     except Exception as e:
         print(f"Alert close button not found: {e}")
-    
-    # Scroll to the location section and click the checkbox
+
     try:
-        location_section = wait.until(EC.presence_of_element_located((By.ID, "country-toggle")))
+        location_section = wait.until(
+            EC.presence_of_element_located((By.ID, "country-toggle")))
         actions = ActionChains(driver)
         actions.move_to_element(location_section).perform()
 
-        checkbox = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='checkbox'][data-display='United States']")))
+        checkbox = wait.until(EC.presence_of_element_located(
+            (By.CSS_SELECTOR, "input[type='checkbox'][data-display='United States']")))
         driver.execute_script("arguments[0].scrollIntoView(true);", checkbox)
         time.sleep(1)
         driver.execute_script("arguments[0].click();", checkbox)
         time.sleep(2)
     except Exception as e:
         print(f"Error locating or clicking checkbox: {e}")
-    
-    # Check if the filters are applied, retry if necessary
+
     try:
         wait.until(EC.presence_of_element_located((By.ID, "applied-filters")))
     except Exception as e:
         print(f"Filters not applied, retrying: {e}")
-        location_section = wait.until(EC.presence_of_element_located((By.ID, "country-toggle")))
+        location_section = wait.until(
+            EC.presence_of_element_located((By.ID, "country-toggle")))
         actions = ActionChains(driver)
         actions.move_to_element(location_section).perform()
-        checkbox = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='checkbox'][data-display='United States']")))
+        checkbox = wait.until(EC.presence_of_element_located(
+            (By.CSS_SELECTOR, "input[type='checkbox'][data-display='United States']")))
         driver.execute_script("arguments[0].scrollIntoView(true);", checkbox)
         time.sleep(1)
         driver.execute_script("arguments[0].click();", checkbox)
         time.sleep(2)
 
-    # Load all jobs
     while True:
-        results = wait.until(EC.presence_of_element_located((By.ID, "search-results-list")))
+        results = wait.until(EC.presence_of_element_located(
+            (By.ID, "search-results-list")))
         job_links = results.find_elements(By.CSS_SELECTOR, "ul > li > a")
         for link in job_links:
             job_url = link.get_attribute("href")
@@ -76,8 +81,10 @@ def loadAllJobs(driver):
                 print('No more pages')
                 break
             else:
-                driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
-                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "next")))
+                driver.execute_script(
+                    "arguments[0].scrollIntoView(true);", next_button)
+                WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.CLASS_NAME, "next")))
                 driver.execute_script("arguments[0].click();", next_button)
                 time.sleep(2)
         except Exception as e:
@@ -86,6 +93,24 @@ def loadAllJobs(driver):
     print(f"Found {len(JOBS)} jobs")
     return JOBS
 
+
+def filter_job_title(job_title):
+    valid_titles = [
+        "Pharmaceutical Sales Specialist",
+        "Pharmaceutical Sales Representative",
+        "Respiratory Specialty Sales Specialist",
+        "District Sales Manager",
+        "Respiratory Biologics Sales Specialist",
+        "Oncology Account Specialist",
+        "Regional Account Manager",
+        "National Oncology Account Director"
+    ]
+    for valid_title in valid_titles:
+        if valid_title in job_title:
+            return True
+    return False
+
+
 def getJobs(driver):
     JOBS = []
     jobs = loadAllJobs(driver)
@@ -93,11 +118,15 @@ def getJobs(driver):
         try:
             driver.get(job)
             time.sleep(2)
-            # jobTitle = driver.find_element(By.CLASS_NAME, "job-description-title").text
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             title_meta = soup.find('meta', {'name': 'gtm_tbcn_jobtitle'})
             jobTitle = title_meta['content'] if title_meta else ''
+
+            # Filter job titles here
+            if not filter_job_title(jobTitle):
+                continue
+
             desc_content = soup.find("div", class_="ats-description")
             jobDescription = desc_content.prettify()
 
@@ -121,7 +150,7 @@ def getJobs(driver):
             state = ', '.join(states) if states else ''
             country = 'United States'
             Zipcode = ''
-                        
+
             posting_date_meta = soup.find('meta', {'name': 'gtm_firstindex'})
             date_posted = posting_date_meta['content'] if posting_date_meta else ''
             job_id_meta = soup.find('meta', {'name': 'gtm_reqid'})
@@ -165,6 +194,7 @@ def getJobs(driver):
             print(f"Error in loading post details: {e}")
     return JOBS
 
+
 def scraping():
     try:
         driver = configure_webdriver(True)
@@ -178,5 +208,6 @@ def scraping():
             print(f"Error : {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 scraping()
