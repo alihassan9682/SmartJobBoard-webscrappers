@@ -105,8 +105,9 @@ def filter_job_title(job_title):
         "Regional Account Manager",
         "National Oncology Account Director"
     ]
+    job_title_lower = job_title.lower()
     for valid_title in valid_titles:
-        if valid_title in job_title:
+        if valid_title.lower() in job_title_lower:
             return True
     return False
 

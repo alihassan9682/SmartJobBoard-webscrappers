@@ -29,6 +29,19 @@ def write_to_csv(data, directory, filename):
             writer.writerow(item)
 
 
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialty Representative",
+        "Account Manager",
+        "Oncology Specialist",
+        "District Sales Manager",
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
+
+
 def loadAllJobs(driver):
     JOBS = []
     wait = WebDriverWait(driver, 10)
@@ -36,7 +49,7 @@ def loadAllJobs(driver):
         EC.presence_of_element_located((By.ID, "system-ialert-button"))
     )
     close.click()
-    
+
     while True:
         # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         results = wait.until(EC.presence_of_element_located(
@@ -46,18 +59,19 @@ def loadAllJobs(driver):
             EC.presence_of_all_elements_located((By.TAG_NAME, "li"))
         )
         jobs = [
-                job.find_element(By.TAG_NAME, "a").get_attribute(
-                    "href"
-                )
+            job.find_element(By.TAG_NAME, "a").get_attribute(
+                "href"
+            )
             for job in jobs
         ]
 
         try:
             JOBS = JOBS + jobs
             next_button = wait.until(
-            EC.presence_of_element_located((By.XPATH, "//button[@class='pagination-page-jump']/following-sibling::a[1][contains(@class, 'next')]"))
-        )
-        
+                EC.presence_of_element_located(
+                    (By.XPATH, "//button[@class='pagination-page-jump']/following-sibling::a[1][contains(@class, 'next')]"))
+            )
+
             if next_button:
                 actions = ActionChains(driver)
                 actions.move_to_element(next_button).click().perform()
@@ -67,7 +81,6 @@ def loadAllJobs(driver):
         except:
             print("No more pages or an error occurred")
             break
-
 
     return JOBS
 
@@ -80,27 +93,31 @@ def getJobs(driver):
             driver.get(job)
             time.sleep(2)
             jobTitle = driver.find_element(By.CLASS_NAME, "header-1").text
-
+            if not filter_job_title(jobTitle):
+                continue
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="ats-description")
             jobDescription = desc_content.prettify()
-            location_meta = soup.find("span", class_="job-location__small job-info")
-            City = state = job_type = Location =''
+            location_meta = soup.find(
+                "span", class_="job-location__small job-info")
+            City = state = job_type = Location = ''
             country = 'US'
 
             if location_meta:
                 Location = location_meta.span.text if location_meta else ''
-                job_type_span = soup.find_all("span", class_="job-location__small job-info")[-1]
-                job_type = job_type_span.text.split("WORK LOCATION TYPE: ")[1].strip() if job_type_span and "WORK LOCATION TYPE: " in job_type_span.text else ""
+                job_type_span = soup.find_all(
+                    "span", class_="job-location__small job-info")[-1]
+                job_type = job_type_span.text.split("WORK LOCATION TYPE: ")[1].strip(
+                ) if job_type_span and "WORK LOCATION TYPE: " in job_type_span.text else ""
                 location_parts = Location.split('-') if Location else ''
                 if len(location_parts) == 3:
                     City = location_parts[2].strip()
                     state = location_parts[1].strip()
                     country = location_parts[0].strip()
 
-                
-            all_job_date_spans = soup.find_all('span', class_='job-date job-info')
+            all_job_date_spans = soup.find_all(
+                'span', class_='job-date job-info')
             additional_locations_span = salary_range = posted_date = ''
             for span in all_job_date_spans:
                 if "ADDITIONAL LOCATIONS:" in span.get_text(separator=" "):
@@ -111,10 +128,11 @@ def getJobs(driver):
                     salary_range = span.text.split("SALARY RANGE: ")[1].strip()
 
             if additional_locations_span:
-                additional_locations_text = additional_locations_span.get_text(separator=" ").split("ADDITIONAL LOCATIONS: ")[1].strip()
+                additional_locations_text = additional_locations_span.get_text(
+                    separator=" ").split("ADDITIONAL LOCATIONS: ")[1].strip()
                 additional_locations = additional_locations_text.split("; ")
-                # print("Additional Locations:", additional_locations)
-                locations =  [loc for loc in additional_locations if "US" in loc]
+                locations = [
+                    loc for loc in additional_locations if "US" in loc]
                 if locations:
                     if Location:
                         Location += ', ' + ', '.join(locations)
@@ -122,21 +140,29 @@ def getJobs(driver):
                         Location = ', '.join(locations)
 
                     if City:
-                        City += ', ' + ', '.join([loc.split('-')[2].strip() for loc in locations if len(loc.split('-')) == 3])
+                        City += ', ' + ', '.join([loc.split('-')[2].strip()
+                                                 for loc in locations if len(loc.split('-')) == 3])
                     else:
-                        City = ', '.join([loc.split('-')[2].strip() for loc in locations if len(loc.split('-')) == 3])
+                        City = ', '.join(
+                            [loc.split('-')[2].strip() for loc in locations if len(loc.split('-')) == 3])
 
                     if state:
-                        state += ', ' + ', '.join([loc.split('-')[1].strip() for loc in locations if len(loc.split('-')) == 3])
+                        state += ', ' + \
+                            ', '.join([loc.split('-')[1].strip()
+                                      for loc in locations if len(loc.split('-')) == 3])
                     else:
-                        state = ', '.join([loc.split('-')[1].strip() for loc in locations if len(loc.split('-')) == 3])
+                        state = ', '.join(
+                            [loc.split('-')[1].strip() for loc in locations if len(loc.split('-')) == 3])
 
                     country = 'US'
             else:
                 print("No additional locations found")
 
+            unique_states = ','.join(
+                sorted(set([single_state.strip() for single_state in state.split(',')])))
             Zipcode = ''
-            job_id = soup.find("span", class_="job-id job-info").text if soup.find("span", class_="job-id job-info") else ""
+            job_id = soup.find("span", class_="job-id job-info").text if soup.find(
+                "span", class_="job-id job-info") else ""
             if "-" in salary_range and len(salary_range) > 1:
                 from_salary, to_salary = salary_range.split(" - ")
                 from_salary = from_salary.strip()
@@ -152,7 +178,7 @@ def getJobs(driver):
                 "Categories": "Pharmaceuticals",
                 "Location": Location,
                 "City": City,
-                "State": state,
+                "State": unique_states,
                 "Country": country,
                 "Zip Code": Zipcode,
                 "Address": Location,
