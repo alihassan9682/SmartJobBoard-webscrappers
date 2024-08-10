@@ -6,16 +6,52 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
-
+import re
+import us
+import geonamescache
 
 from bs4 import BeautifulSoup
 import csv
 import os
 
+gc = geonamescache.GeonamesCache()
+
+us_cities = gc.get_cities()
+us_states = us.states.mapping('abbr', 'name')
+us_states_rev = us.states.mapping('name', 'abbr')
 
 def request_url(driver, url):
     driver.get(url)
 
+
+def find_city_state_in_title(title):
+    title_cleaned = title.lower()
+
+    print(f"Processing title: {title_cleaned}")
+
+    detected_city = None
+    detected_state = None
+
+    for city in us_cities.values():
+        city_name = city['name'].lower()
+        if re.search(rf'\b{re.escape(city_name)}\b', title_cleaned):
+            detected_city = city['name']
+            print(f"Found city: {detected_city} in title")
+            break
+
+    for state_name in us_states.values():
+        if re.search(rf'\b{re.escape(state_name.lower())}\b', title_cleaned):
+            detected_state = state_name
+            print(f"Found state: {detected_state} in title")
+            break
+
+    for abbr, name in us_states.items():
+        if re.search(rf'\b{re.escape(abbr.lower())}\b', title_cleaned, re.IGNORECASE):
+            detected_state = name
+            print(f"Found state abbreviation: {abbr.upper()} (state: {name}) in title")
+            break
+
+    return detected_city, detected_state
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -155,11 +191,17 @@ def getJobs(driver):
                             [loc.split('-')[1].strip() for loc in locations if len(loc.split('-')) == 3])
 
                     country = 'US'
+                state = ','.join(
+                sorted(set([single_state.strip() for single_state in state.split(',')])))  
             else:
                 print("No additional locations found")
 
-            unique_states = ','.join(
-                sorted(set([single_state.strip() for single_state in state.split(',')])))
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            print('city', city_title, state_title)
+            if city_title:
+                City = city_title
+            if state_title:
+                state = state_title
             Zipcode = ''
             job_id = soup.find("span", class_="job-id job-info").text if soup.find(
                 "span", class_="job-id job-info") else ""
@@ -178,7 +220,7 @@ def getJobs(driver):
                 "Categories": "Pharmaceuticals",
                 "Location": Location,
                 "City": City,
-                "State": unique_states,
+                "State": state,
                 "Country": country,
                 "Zip Code": Zipcode,
                 "Address": Location,

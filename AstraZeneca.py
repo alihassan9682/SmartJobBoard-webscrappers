@@ -5,14 +5,54 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 import csv
+import re
+import us
+import geonamescache
 import os
 
 from helpers import configure_webdriver, is_remote
 
+gc = geonamescache.GeonamesCache()
+
+us_cities = gc.get_cities()
+us_states = us.states.mapping('abbr', 'name')
+us_states_rev = us.states.mapping('name', 'abbr')
 
 def request_url(driver, url):
     driver.get(url)
 
+def find_city_state_in_title(title):
+    title_cleaned = title.lower()
+
+    # Debug: Print cleaned title
+    print(f"Processing title: {title_cleaned}")
+
+    detected_city = None
+    detected_state = None
+
+    # Check for city in the title using regular expressions
+    for city in us_cities.values():
+        city_name = city['name'].lower()
+        if re.search(rf'\b{re.escape(city_name)}\b', title_cleaned):
+            detected_city = city['name']
+            print(f"Found city: {detected_city} in title")
+            break  # Break if city is found, no need to search further
+
+    # Check for state (full name) in the title
+    for state_name in us_states.values():
+        if re.search(rf'\b{re.escape(state_name.lower())}\b', title_cleaned):
+            detected_state = state_name
+            print(f"Found state: {detected_state} in title")
+            break  # Break if state is found, no need to search further
+
+    # Check for state abbreviation in the title (case-insensitive)
+    for abbr, name in us_states.items():
+        if re.search(rf'\b{re.escape(abbr.lower())}\b', title_cleaned, re.IGNORECASE):
+            detected_state = name
+            print(f"Found state abbreviation: {abbr.upper()} (state: {name}) in title")
+            break  # Break if state abbreviation is found, no need to search further
+
+    return detected_city, detected_state
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -103,7 +143,7 @@ def filter_job_title(job_title):
         "Respiratory Biologics Sales Specialist",
         "Oncology Account Specialist",
         "Regional Account Manager",
-        "National Oncology Account Director"
+        "National Oncology Account Director",
     ]
     job_title_lower = job_title.lower()
     for valid_title in valid_titles:
@@ -149,6 +189,12 @@ def getJobs(driver):
             Location = ' | '.join(us_locations)
             city = ', '.join(cities) if cities else ''
             state = ', '.join(states) if states else ''
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            print('city', city_title, state_title)
+            if city_title:
+                city = city_title
+            if state_title:
+                state = state_title
             country = 'United States'
             Zipcode = ''
 

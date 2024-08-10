@@ -26,6 +26,15 @@ def write_to_csv(data, directory, filename):
         for item in data:
             writer.writerow(item)
 
+def filter_job_title(job_title):
+    valid_titles = [
+        "Therapeutic Area Specialist",
+        "Manager of Regional Operations",
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def loadAllJobs(driver):
     JOBS = []
@@ -37,7 +46,7 @@ def loadAllJobs(driver):
             (By.CLASS_NAME, "position-cards-container")
         ))
         jobs = WebDriverWait(results, 10).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "card"))
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "job-card-container"))
         )
         for index in range(last_processed_index, len(jobs)):
             job = jobs[index]
@@ -87,6 +96,8 @@ def getJobs(driver):
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             jobTitle = soup.find("h1", class_="position-title").text
+            if not filter_job_title(jobTitle):
+                continue
             desc_content = soup.find("div", class_="position-job-description-column")
             jobDescription = desc_content.prettify()
 
@@ -144,7 +155,7 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = " https://jobs.bms.com/careers?query=sales&location=Field%20-%20United%20States%20-%20US&pid=137461081507&domain=bms.com&sort_by=relevance&triggerGoButton=false&triggerGoButton=true"
+        url = "https://jobs.bms.com/careers?query=sales&location=Field%20-%20United%20States%20-%20US&pid=137461081507&domain=bms.com&sort_by=relevance&triggerGoButton=false&triggerGoButton=true"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
