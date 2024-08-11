@@ -139,5 +139,5 @@ ehthumbs.db
 
 # CSV files
 *.csv
-requirements.txt
+
 helpers.py
