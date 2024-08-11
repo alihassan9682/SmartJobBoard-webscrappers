@@ -1,6 +1,7 @@
 import time
 
-from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
+from extractCityState import find_city_state_in_title
+from helpers import configure_webdriver
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -95,22 +96,30 @@ def getJobs(driver):
             time.sleep(2) 
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
-            jobTitle = soup.find("h1", class_="position-title").text
+            job_meta = soup.find("h1", class_="position-title")
+            jobTitle = job_meta.text if job_meta else ''
             if not filter_job_title(jobTitle):
                 continue
             desc_content = soup.find("div", class_="position-job-description-column")
             jobDescription = desc_content.prettify()
 
             selected_card = soup.find("div", class_='card-selected')
-            location_meta = selected_card.find("p",class_='position-location').text
-            Location = location_meta if location_meta else ''
+            location_meta = selected_card.find("p",class_='field-label')
+            print('llooo', location_meta)
+            Location = location_meta.text if location_meta else ''
 
             state = City = ''
             if Location:
-                location_parts = Location.split("- ")
+                location_parts = Location.split("-")
                 City = location_parts[0] if location_parts[0] else ''
                 state = location_parts[1] if len(location_parts) > 1 and location_parts[1] else ''
             country = 'United States'
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            print('city', city_title, state_title)
+            if city_title:
+                City = city_title
+            if state_title:
+                state = state_title
             Zipcode = ''
             jobDetails = {
                 "Job Id": jobs.index(job),
