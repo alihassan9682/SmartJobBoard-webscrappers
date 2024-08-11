@@ -1,57 +1,19 @@
 import time
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
-import re
-import us
-import geonamescache
 
 from bs4 import BeautifulSoup
 import csv
 import os
 
-gc = geonamescache.GeonamesCache()
-
-us_cities = gc.get_cities()
-us_states = us.states.mapping('abbr', 'name')
-us_states_rev = us.states.mapping('name', 'abbr')
-
 def request_url(driver, url):
     driver.get(url)
-
-
-def find_city_state_in_title(title):
-    title_cleaned = title.lower()
-
-    print(f"Processing title: {title_cleaned}")
-
-    detected_city = None
-    detected_state = None
-
-    for city in us_cities.values():
-        city_name = city['name'].lower()
-        if re.search(rf'\b{re.escape(city_name)}\b', title_cleaned):
-            detected_city = city['name']
-            print(f"Found city: {detected_city} in title")
-            break
-
-    for state_name in us_states.values():
-        if re.search(rf'\b{re.escape(state_name.lower())}\b', title_cleaned):
-            detected_state = state_name
-            print(f"Found state: {detected_state} in title")
-            break
-
-    for abbr, name in us_states.items():
-        if re.search(rf'\b{re.escape(abbr.lower())}\b', title_cleaned, re.IGNORECASE):
-            detected_state = name
-            print(f"Found state abbreviation: {abbr.upper()} (state: {name}) in title")
-            break
-
-    return detected_city, detected_state
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
