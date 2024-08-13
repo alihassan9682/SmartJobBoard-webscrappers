@@ -1,5 +1,6 @@
 import time
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 
 from selenium.webdriver.common.by import By
@@ -24,12 +25,40 @@ def write_to_csv(data, directory, filename):
         for item in data:
             writer.writerow(item)
 
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Territory Manager",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
+
 def loadAllJobs(driver):
     JOBS = []
     unique_jobs = set()
     wait = WebDriverWait(driver, 10)
     time.sleep(2)
-
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     results = wait.until(EC.presence_of_element_located(
         (By.CSS_SELECTOR, "[data-id='4025647004']")
     ))
@@ -60,8 +89,10 @@ def getJobs(driver):
             driver.switch_to.frame(iframe)
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
-            title_meta = soup.find("h1", class_="app-title")
+            title_meta = soup.find("h1", class_="section-header")
             jobTitle = title_meta.text if title_meta else ''
+            if not filter_job_title(jobTitle):
+                continue
             desc_content = soup.find('div', {'id': 'content'})
             jobDescription = desc_content.prettify() if desc_content else ''
 
@@ -80,6 +111,11 @@ def getJobs(driver):
                 else:
                     City = state = ''
 
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            if city_title:
+                City = city_title
+            if state_title:
+                state = state_title
             Zipcode = ''
             jobDetails = {
                 "Job Id": jobs.index(job),

@@ -140,7 +140,7 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://en.jobs.sanofi.com/search-jobs/sales/20873/1"
+        url = "https://jobs.sanofi.com/en/search-jobs/sales/United%20States/2649/1/2/6252001/39x76/-98x5/50/2"
         try:
             driver.get(url)
             Jobs = getJobs(driver)

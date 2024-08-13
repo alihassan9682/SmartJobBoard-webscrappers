@@ -104,7 +104,7 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "N/A",
+                "Employer Email": "msh@mshmerck.com",
                 "Full Name": "",
                 "Company Name": "Merck",
                 "Employer Website": "https://www.merck.com/",

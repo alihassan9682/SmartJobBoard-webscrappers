@@ -115,7 +115,6 @@ def getJobs(driver):
                 state = location_parts[1] if len(location_parts) > 1 and location_parts[1] else ''
             country = 'United States'
             city_title, state_title = find_city_state_in_title(jobTitle)
-            print('city', city_title, state_title)
             if city_title:
                 City = city_title
             if state_title:
