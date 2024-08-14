@@ -112,7 +112,7 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "N/A",
+                "Employer Email": "msh@mshjhonsan.com",
                 "Full Name": "",
                 "Company Name": "Johnson and Johnson",
                 "Employer Website": "https://jobs.jnj.com/",

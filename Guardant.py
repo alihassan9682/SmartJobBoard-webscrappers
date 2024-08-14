@@ -1,5 +1,6 @@
 import time
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 
 from selenium.webdriver.common.by import By
@@ -23,6 +24,34 @@ def write_to_csv(data, directory, filename):
         writer.writeheader()
         for item in data:
             writer.writerow(item)
+
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Territory Manager",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def loadAllJobs(driver):
     JOBS = []
@@ -83,6 +112,13 @@ def getJobs(driver):
             soup = BeautifulSoup(page_source, "html.parser")
             title_meta = soup.find("h1", class_="job-title")
             jobTitle = title_meta.text if title_meta else ''
+            City = state = ''
+            country = 'United States'
+            City, state = find_city_state_in_title(jobTitle)
+            if not filter_job_title(jobTitle):
+                continue
+            if City is None and state is None:
+                continue
             desc_content = soup.find('div', {'itemprop': 'description'})
             jobDescription = desc_content.prettify() if desc_content else ''
             job_details = {}
@@ -99,18 +135,6 @@ def getJobs(driver):
 
             location_meta = job_details.get('Formatted Address', '')
             Location = location_meta if location_meta else ''
-            City = state = ''
-            country = 'United States'
-            if Location:
-                location_parts = Location.split(',')
-                if len(location_parts) == 3:
-                    City = location_parts[0].strip()
-                    state = location_parts[1].strip()
-                elif len(location_parts) == 2:
-                    City = location_parts[0].strip()
-                    state = location_parts[1].strip()
-                else:
-                    City = state = ''
 
             Zipcode = ''
             jobDetails = {
