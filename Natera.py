@@ -80,11 +80,12 @@ def loadAllJobs(driver):
 
 def getJobs(driver):
     JOBS = []
-    time.sleep(1)
     jobs = loadAllJobs(driver)
     for job in jobs:
         try:
             driver.get(job)
+            time.sleep(3)
+            
             iframe = driver.find_element(By.ID, 'grnhse_iframe')
             driver.switch_to.frame(iframe)
             page_source = driver.page_source
@@ -93,29 +94,24 @@ def getJobs(driver):
             jobTitle = title_meta.text if title_meta else ''
             if not filter_job_title(jobTitle):
                 continue
-            desc_content = soup.find('div', {'id': 'content'})
+            desc_content = soup.find('div', class_="job__description")
             jobDescription = desc_content.prettify() if desc_content else ''
-
-            location_meta = soup.find('div', class_='location')
-            Location = location_meta.text.strip() if location_meta else ''
+            print('job description', jobDescription)
+            location_meta = desc_content.find_all('p')
+            Location = location_meta[1].text.strip() if location_meta else ''
+            print("Location",Location)
             City = state = ''
             country = 'United States'
-            if Location:
-                location_parts = Location.split(',')
-                if len(location_parts) == 3:
-                    City = location_parts[0].strip()
-                    state = location_parts[1].strip()
-                elif len(location_parts) == 2:
-                    City = location_parts[0].strip()
-                    state = location_parts[1].strip()
-                else:
-                    City = state = ''
 
-            city_title, state_title = find_city_state_in_title(jobTitle)
+            city_title, state_title = find_city_state_in_title(Location)
             if city_title:
                 City = city_title
             if state_title:
                 state = state_title
+            if city_title and state_title:
+                Location = city_title + ', ' + state_title
+            else:
+                Location = ''
             Zipcode = ''
             jobDetails = {
                 "Job Id": jobs.index(job),
