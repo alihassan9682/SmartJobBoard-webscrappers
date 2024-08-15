@@ -7,13 +7,13 @@
 #5. ThermoFisher
 #6. Takeda
 #7. Sotera
-#7. Sotera
+#8. Sotera
 
 ##Following files have links issues or unable to scrap now
 #1. Stryker link updated but the scraper needs to be updated completely.
 #2. Siemens classes are changed maybe
 #3. Sanofi classes are changed maybe
-#3. Roche classes are changed maybe
+#4. Roche classes are changed maybe
 
 ##Following files are revised by the client and also contains websites that need to be revamped
 #1. Abbvie completed
@@ -21,4 +21,5 @@
 #3. AstraZaneca completed
 #4. BMS revamped and completed.
 #5. Natera revamped and completed.
+#6. Guadrant completed.
 
