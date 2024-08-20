@@ -7,10 +7,39 @@ from bs4 import BeautifulSoup
 import csv
 import os
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, is_remote  
 
 def request_url(driver, url):
     driver.get(url)
+
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Territory Manager",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -81,6 +110,8 @@ def getJobs(driver):
             time.sleep(2)
             job_meta = driver.find_element(By.CLASS_NAME, "job-title")
             jobTitle = job_meta.text if job_meta else ''
+            if not filter_job_title(jobTitle):
+                continue
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="jd-info")
@@ -115,7 +146,11 @@ def getJobs(driver):
                     print('issue with the location')
             except:
                 pass
-
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            if city_title:
+                city = city_title
+            if state_title:
+                state = state_title
             Zipcode = ''
             date_posted = soup.find('div', class_='job-info au-target')['data-ph-at-job-post-date-text']
             job_type = soup.find('div', class_='job-info au-target')['data-ph-at-job-type-text']

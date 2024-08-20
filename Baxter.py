@@ -1,5 +1,6 @@
 import time
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 
 from selenium.webdriver.common.by import By
@@ -16,6 +17,33 @@ import os
 def request_url(driver, url):
     driver.get(url)
 
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Territory Manager",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -83,13 +111,13 @@ def getJobs(driver):
             job_elements = None
             try:
                 job_elements = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, 'name-place'))
+                    EC.presence_of_element_located((By.CLASS_NAME, 'jd-header-content__job-heading'))
                 )
             except:
-                job_elements = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, 'jd-intro'))
-                )
+                print("No Job element found")
             jobTitle = job_elements.find_element(By.TAG_NAME, 'h1').text
+            if not filter_job_title(jobTitle):
+                continue
             # info_bar = job_elements.find_element(By.CLASS_NAME, 'info-bar')
             job_id_element = job_elements.find_element(By.CLASS_NAME, 'job-id')
             job_id = job_id_element.text.replace("Req #: ", "").strip() if job_id_element else jobs.index(job)
@@ -121,7 +149,11 @@ def getJobs(driver):
             else:
                 City = state = ''
             country = 'Unites States'
-
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            if city_title:
+                City = city_title
+            if state_title:
+                state = state_title
             Zipcode = ''
 
             jobDetails = {
