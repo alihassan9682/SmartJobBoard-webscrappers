@@ -1,5 +1,6 @@
 import time
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, is_remote
 
 from selenium.webdriver.common.by import By
@@ -14,6 +15,34 @@ import os
 def request_url(driver, url):
     driver.get(url)
 
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Territory Manager",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Therapy Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -130,6 +159,8 @@ def getJobs(driver):
             driver.get(job)
             time.sleep(2)
             jobTitle = driver.find_element(By.CLASS_NAME, "title").text
+            if not filter_job_title(jobTitle):
+                continue
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="job-display-details")
@@ -138,7 +169,7 @@ def getJobs(driver):
                 job_display_details_buttons.decompose()
             jobDescription = desc_content.prettify()
 
-            location_tag = soup.find('p', text='Location').find_next_sibling('p')
+            location_tag = soup.find('p', string='Location').find_next_sibling('p')
             Location = location_tag.text if location_tag else ''
 
             location_parts = Location.split(", ")
@@ -146,7 +177,11 @@ def getJobs(driver):
             state = ''
             country = location_parts[1] if location_parts[1] else ''
             Zipcode = ''
-
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            if city_title:
+                City = city_title
+            if state_title:
+                state = state_title
             jobDetails = {
                 "Job Id": jobs.index(job),
                 "Job Title": jobTitle,
@@ -190,7 +225,7 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://www.novonordisk.com/careers/find-a-job/career-search-results.html?searchText=sales&countries=United+States&categories="
+        url = "https://www.novonordisk.com/careers/find-a-job/career-search-results.html?searchText=&countries=United+States&categories=Sales"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
