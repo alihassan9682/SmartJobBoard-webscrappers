@@ -7,10 +7,40 @@ from bs4 import BeautifulSoup
 import csv
 import os
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, is_remote  # Ensure these imports are correct for your environment
 
 def request_url(driver, url):
     driver.get(url)
+
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Territory Manager",
+        "Oncology Specialist",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -27,7 +57,7 @@ def loadAllJobs(driver):
     JOBS = []
     wait = WebDriverWait(driver, 10)
     close = wait.until(
-        EC.presence_of_element_located((By.CLASS_NAME, "system-alert-close"))
+        EC.presence_of_element_located((By.CLASS_NAME, "banner-close-button"))
     )
     close.click()
 
@@ -46,7 +76,20 @@ def loadAllJobs(driver):
 
     driver.execute_script("arguments[0].click();", checkbox)
     time.sleep(2)
+    checkbox1 = wait.until(
+            EC.presence_of_element_located((By.ID, "category-toggle"))
+        )
 
+    driver.execute_script("arguments[0].scrollIntoView(true);", checkbox1)
+    driver.execute_script("arguments[0].click();", checkbox1)
+    time.sleep(1)
+    
+    sales_checkbox = wait.until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "[data-display=Sales]"))
+    )
+
+    driver.execute_script("arguments[0].click();", sales_checkbox)
+    time.sleep(2)
     while True:
         results = wait.until(EC.presence_of_element_located(
             (By.ID, "search-results-list")
@@ -77,38 +120,54 @@ def getJobs(driver):
     for job in jobs:
         try:
             driver.get(job)
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight * 0.4);")
             time.sleep(2)
-            jobTitle = driver.find_element(By.CLASS_NAME, "main-heading").text
+            job_div = driver.find_element(By.CLASS_NAME, "job-description")
+            jobTitle = job_div.find_element(By.TAG_NAME, "h1").text
+            job_id = job_div.get_attribute("data-job-id")
+            if not filter_job_title(jobTitle):
+                continue
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="ats-description")
-            jobDescription = desc_content.prettify()
-            Location = driver.find_element(By.CLASS_NAME, "job-location").text
-            location_meta = Location.split(';') if ';' in Location else [Location]
-            cities = [loc.strip().split(',')[0].strip() if loc.strip() else '' for loc in location_meta]
-            states = [loc.strip().split(',')[1].strip() if ',' in loc and len(loc.split(',')) > 1 else '' for loc in location_meta]
+            jobDescription = desc_content.prettify() if desc_content else ''
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            # Extract location safely
+            Location = driver.find_element(By.CLASS_NAME, "job-location").text if driver.find_elements(By.CLASS_NAME, "job-location") else ''
+            location_meta = Location.split(';') if Location and ';' in Location else [Location]
+            cities = []
+            states = []
+            
+            for loc in location_meta:
+                parts = loc.strip().split(',')
+                if len(parts) > 0:
+                    cities.append(parts[0].strip())
+                if len(parts) > 1:
+                    states.append(parts[1].strip())
 
             city = ', '.join(cities) if cities else ''
             state = ', '.join(states) if states else ''
-
+            if city_title:
+                city = city_title
+            if state_title:
+                state = state_title
             country = 'United States'
             Zipcode = ''
-            date_posted = soup.find('span', class_='job-date').text
-            job_id = soup.find('span', class_='job-id job-info icon-job-id with-text').text
-            job_type = soup.find('span', class_='icon-contract with-text').text
+            date_posted = soup.find('span', class_='job-date').text if soup.find('span', class_='job-date') else ''
+            job_type = soup.find('span', class_='job-type job-info').text if soup.find('span', class_='job-type job-info') else ''
 
             jobDetails = {
-                "Job Id": job_id,
+                "Job Id": job_id if job_id else jobs.index(job),
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
-                "Job Type": job_type,
+                "Job Type": job_type if job_type else '',
                 "Categories": "Pharmaceuticals",
                 "Location": Location,
                 "City": city,
                 "State": state,
                 "Country": country,
                 "Zip Code": Zipcode,
-                "Address":Location,
+                "Address": Location,
                 "Remote": is_remote(Location),
                 "Salary From": "",
                 "Salary To": "",
