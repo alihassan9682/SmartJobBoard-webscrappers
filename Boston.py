@@ -1,5 +1,6 @@
 import time
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 
 from selenium.webdriver.common.by import By
@@ -14,6 +15,32 @@ import os
 def request_url(driver, url):
     driver.get(url)
 
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -116,6 +143,8 @@ def getJobs(driver):
             soup = BeautifulSoup(page_source, "html.parser")
             job_meta = soup.find("h1", class_="position-title")
             jobTitle = job_meta.text if job_meta else ''
+            if not filter_job_title(jobTitle):
+                continue
             desc_content = soup.find("div", class_="position-job-description-column")
             jobDescription = desc_content.prettify() if desc_content else ''
 
@@ -125,6 +154,12 @@ def getJobs(driver):
             Location =  Location_detail.split('and')[0] if 'and' in Location_detail else Location_detail
 
             City, state, country = get_location_details(Location_detail)
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            if city_title:
+                City = city_title
+            if state_title:
+                state = state_title
+
             country = 'United States'
             Zipcode = ''
 
@@ -171,7 +206,7 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://bostonscientific.eightfold.ai/careers?query=sales%20&location=united%20states&pid=563602796078775&domain=bostonscientific.com&sort_by=relevance&triggerGoButton=false&triggerGoButton=true"
+        url = "https://bostonscientific.eightfold.ai/careers?query=sales%20&location=united%20states&pid=563602796281461&domain=bostonscientific.com&sort_by=relevance"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
