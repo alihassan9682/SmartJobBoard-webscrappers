@@ -145,7 +145,7 @@ def getJobs(driver):
             Zipcode = ''
             city_title, state_title = find_city_state_in_title(jobTitle)
             if city_title:
-                City = city_title
+                city = city_title
             if state_title:
                 state = state_title
 

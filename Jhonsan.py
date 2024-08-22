@@ -1,5 +1,6 @@
 import time
 
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 
 from selenium.webdriver.common.by import By
@@ -13,6 +14,32 @@ import os
 def request_url(driver, url):
     driver.get(url)
 
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -68,6 +95,8 @@ def getJobs(driver):
             driver.get(job[0])
             time.sleep(2)
             jobTitle = driver.find_element(By.CLASS_NAME, "hero-heading").text
+            if not filter_job_title(jobTitle):
+                continue
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("article", class_="cms-content")
@@ -78,7 +107,6 @@ def getJobs(driver):
 
             job_meta = soup.find('ul', class_='job-meta')
             function_li = job_meta.find_all('li')
-            print('function lis', function_li[6].span.text.strip())
             location = function_li[4].span.text.strip()
             location_parts = location.split(',')
             if len(location_parts) == 3:
@@ -89,6 +117,11 @@ def getJobs(driver):
                 city = state = ''
                 country = 'United States'
             Zipcode = ''
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            if city_title:
+                city = city_title
+            if state_title:
+                state = state_title
             jobDetails = {
                 "Job Id": function_li[6].span.text.strip(),
                 "Job Title": jobTitle,
