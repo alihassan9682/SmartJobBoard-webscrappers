@@ -1,4 +1,5 @@
 import time
+from extractCityState import find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -12,6 +13,34 @@ import os
 def request_url(driver, url):
     driver.get(url)
 
+def filter_job_title(job_title):
+    valid_titles = [
+        "Specialist",
+        "Speciality",
+        "Representative",
+        "District Manager",
+        "Regional manager",
+        "Account Manager",
+        "Sales Manager",
+        "Sales Rep",
+        "Sales Director",
+        "Account Executive",
+        "District Manager",
+        "Regional Manager",
+        "Account Manager",
+        "Sales Executive",
+        "Regional Director",
+        "Territory Manager",
+        "Account Executive",
+        "Senior Executive",
+        "Client Manager",
+        "Marketing Manager",
+        "Brand Manager"
+    ]
+    for valid_title in valid_titles:
+        if valid_title.lower() in job_title.lower():
+            return True
+    return False
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -26,9 +55,6 @@ def write_to_csv(data, directory, filename):
 
 
 def get_location_details(location):
-    if 'and' in location:
-        location = location.split('and')[0].strip()
-
     parts = location.split(', ')
     city = state = country = ''
 
@@ -47,56 +73,42 @@ def get_location_details(location):
 
 def loadAllJobs(driver):
     JOBS = []
-    unique_jobs = set()
     wait = WebDriverWait(driver, 10)
-    last_processed_index = 0
+
     while True:
-        results = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "position-cards-container")))
+        results = wait.until(EC.presence_of_element_located(
+            (By.CLASS_NAME, "css-8j5iuw")
+        ))
+        jobs = WebDriverWait(results, 10).until(
+            EC.presence_of_all_elements_located(
+                (By.CLASS_NAME, "css-19uc56f"))
+        )
+        jobs = [
+            job.get_attribute(
+                "href"
+            )
+            for job in jobs
+        ]
+
         try:
-            jobs = WebDriverWait(results, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "position-card")))
-        except StaleElementReferenceException:
-            print("StaleElementReferenceException occurred while locating job cards. Refreshing...")
-            continue
-        for index in range(last_processed_index, len(jobs)):
-            job = jobs[index]
-            try:
-                driver.execute_script("arguments[0].scrollIntoView(true);", job)
-                time.sleep(1)
-                job.click()
-                time.sleep(2)
+            JOBS = JOBS + jobs
 
-                job_url = driver.current_url
-
-                if job_url not in unique_jobs:
-                    unique_jobs.add(job_url)
-                    JOBS.append(job_url)
-    
-            except StaleElementReferenceException as e:
-                print(f"StaleElementReferenceException encountered: {e}")
-                time.sleep(1)
-                continue
-            except Exception as e:
-                print(f"Error processing job card: {e}")
-
-        last_processed_index = len(jobs)
-        try:
-            load_more_button = driver.find_element(By.CLASS_NAME, "show-more-positions")
-            driver.execute_script("arguments[0].scrollIntoView(true);", load_more_button)
-            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "show-more-positions")))
-            try:
-                driver.execute_script("arguments[0].click();", load_more_button)
-            except ElementClickInterceptedException:
-                time.sleep(2)
-                driver.execute_script("arguments[0].click();", load_more_button)
-            time.sleep(2)
-        except NoSuchElementException:
-            print("No more 'Load More' button found, all jobs are loaded.")
-            break
-        except Exception as e:
-            print(f"Error clicking load more button: {e}")
+            next_button = wait.until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "[data-uxi-element-id='next']"))
+            )
+            if next_button:
+                    driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
+                    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "[data-uxi-element-id='next']")))
+                    driver.execute_script("arguments[0].click();", next_button)
+                    time.sleep(2)
+            else:
+                print('No more next button')
+                break
+        except:
+            print("No more pages or an error occurred")
             break
     return JOBS
-
 
 def getJobs(driver):
     JOBS = []
@@ -105,37 +117,41 @@ def getJobs(driver):
     for job in jobs:
         try:
             driver.get(job)
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2) 
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
-            job_meta = soup.find("h1", class_="position-title")
+            job_meta = driver.find_element(By.CSS_SELECTOR, "[data-automation-id='jobPostingHeader']")
             jobTitle = job_meta.text if job_meta else ''
-            
-            # Extract job description and remove spans and inline styles
-            desc_content = soup.find("div", class_="position-job-description")
-            if desc_content:
-                for span in desc_content.find_all("span"):
-                    span.unwrap()  # Remove the <span> tags but keep their text
-                for tag in desc_content.find_all(True):
-                    tag.attrs = {}  # Remove all attributes from all tags
-                jobDescription = desc_content.prettify(formatter="html")
-            else:
-                jobDescription = ''
-
-            selected_card = soup.find("div", class_='card-selected')
-            location_meta = selected_card.find("p", class_='position-location')
-            Location_detail = location_meta.text if location_meta else ''
-            Location = Location_detail.split('and')[0] if 'and' in Location_detail else Location_detail
-
-            City, state, country = get_location_details(Location_detail)
+            if not filter_job_title(jobTitle):
+                continue
+            city_title, state_title = find_city_state_in_title(jobTitle)
+            desc_content = soup.select_one("[data-automation-id='jobPostingDescription']")
+            jobDescription = desc_content.get_text() if desc_content else ''
+            job_details = soup.select_one("[data-automation-id='job-posting-details']")
+            location_meta = job_details.select_one('div[data-automation-id="locations"] dd') if job_details else ''
+            Location = location_meta.get_text() if location_meta else ''
+            job_type_meta = job_details.select_one('div[data-automation-id="time"] dd') if job_details else ''
+            job_id_meta = job_details.select_one('div[data-automation-id="requisitionId"] dd') if job_details else ''
+            date_posted_meta = job_details.select_one('div[data-automation-id="postedOn"] dd') if job_details else ''
+        
+            job_id = job_id_meta.get_text() if job_id_meta else len(JOBS) + 1
+            job_type = job_type_meta.get_text() if job_type_meta else ''
+            date_posted = date_posted_meta.get_text() if date_posted_meta else ''
+            City, state, country = get_location_details(Location)
             country = 'United States'
+
+            if city_title:
+                City = city_title
+            if state_title:
+                state = state_title
             Zipcode = ''
 
             jobDetails = {
-                "Job Id": jobs.index(job),
+                "Job Id": job_id,
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
-                "Job Type": '',
+                "Job Type": job_type,
                 "Categories": "Medical Device",
                 "Location": Location,
                 "City": City,
@@ -149,7 +165,7 @@ def getJobs(driver):
                 "Salary Period": "",
                 "Apply URL": job,
                 "Apply Email": "",
-                "Posting Date": "",
+                "Posting Date": date_posted,
                 "Expiration Date": "",
                 "Applications": "",
                 "Status": "",
@@ -160,7 +176,7 @@ def getJobs(driver):
                 "Employer Website": "https://medtronic.eightfold.ai",
                 "Employer Phone": "",
                 "Employer Logo": "https://static.vscdn.net/images/careers/demo/medtronic-sandbox/main_logo_tagline",
-                "Company Description": "As we engineer breakthrough medical discoveries, we develop new ways to enable the world to access them.Diversity fuels the innovation behind our life-saving technologies.",
+                "Company Description": "As we engineer breakthrough medical discoveries, we develop new ways to enable the world to access them. Diversity fuels the innovation behind our life-saving technologies.",
                 "Status": "Active",
             }
             JOBS.append(jobDetails)
@@ -177,7 +193,7 @@ def scraping():
     try:
         driver = configure_webdriver(True)
         driver.maximize_window()
-        url = "https://medtronic.eightfold.ai/careers?query=Sales&location=United%20States&pid=22674715&domain=medtronic.com&sort_by=relevance"
+        url = "https://medtronic.wd1.myworkdayjobs.com/MedtronicCareers?locationCountry=bc33aa3152ec42d4995f4791a106ed09&jobFamilyGroup=3b9e5dd261944d18b3f8d166e2c447bc"
         try:
             driver.get(url)
             Jobs = getJobs(driver)
