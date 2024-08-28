@@ -95,6 +95,7 @@ def getJobs(driver):
                 city = city_title
             if state_title:
                 state = state_title
+            location = city + ', ' + state + ', ' + 'USA'
             jobDetails = {
                 "Job Id": function_li[6].span.text.strip(),
                 "Job Title": jobTitle,

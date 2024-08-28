@@ -129,7 +129,7 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-
+            Location = City + ', ' + state + ', ' + 'USA'
             # Construct job details dictionary
             jobDetails = {
                 "Job Id": job_id if job_id else jobs.index(job),

@@ -135,6 +135,7 @@ def getJobs(driver):
                 city = city_title
             if state_title:
                 state = state_title
+            Location = city + ', ' + state + ', ' + 'USA'
             country = 'United States'
             Zipcode = ''
 

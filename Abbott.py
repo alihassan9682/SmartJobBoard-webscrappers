@@ -121,7 +121,7 @@ def getJobs(driver):
                 city = city_title
             if state_title:
                 state = state_title
-
+            location = city + ', ' + state + ', ' + 'USA'
             date_posted = soup.find('div', class_='job-info au-target')['data-ph-at-job-post-date-text']
             job_id = soup.find('div', class_='job-info au-target')['data-ph-at-job-id-text']
 

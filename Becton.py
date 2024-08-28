@@ -97,6 +97,7 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
+            Location = City + ', ' + state + ', ' + 'USA'
             Zipcode = ''
 
             jobDetails = {
@@ -105,7 +106,7 @@ def getJobs(driver):
                 "Job Description": jobDescription,
                 "Job Type": '',
                 "Categories": "Medical Device",
-                "Location": '',
+                "Location": Location,
                 "City": City,
                 "State": state,
                 "Country": country,

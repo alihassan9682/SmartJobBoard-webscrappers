@@ -150,6 +150,7 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
+            Location = City + ', ' + state + ', ' + 'USA'
             Zipcode = ''
             job_id = soup.find("span", class_="job-id job-info").text if soup.find(
                 "span", class_="job-id job-info") else ""

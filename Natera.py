@@ -82,6 +82,7 @@ def getJobs(driver):
                 Location = city_title + ', ' + state_title
             else:
                 Location = ''
+            Location = City + ', ' + state + ', ' + 'USA'
             Zipcode = ''
             jobDetails = {
                 "Job Id": jobs.index(job),
