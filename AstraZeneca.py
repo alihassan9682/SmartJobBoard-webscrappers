@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import csv
 import os
 
-from extractCityState import find_city_state_in_title
+from extractCityState import filter_job_title, find_city_state_in_title
 from helpers import configure_webdriver, is_remote
 
 def request_url(driver, url):
@@ -93,24 +93,6 @@ def loadAllJobs(driver):
     return JOBS
 
 
-def filter_job_title(job_title):
-    valid_titles = [
-        "Pharmaceutical Sales Specialist",
-        "Pharmaceutical Sales Representative",
-        "Respiratory Specialty Sales Specialist",
-        "District Sales Manager",
-        "Respiratory Biologics Sales Specialist",
-        "Oncology Account Specialist",
-        "Regional Account Manager",
-        "National Oncology Account Director",
-    ]
-    job_title_lower = job_title.lower()
-    for valid_title in valid_titles:
-        if valid_title.lower() in job_title_lower:
-            return True
-    return False
-
-
 def getJobs(driver):
     JOBS = []
     jobs = loadAllJobs(driver)
@@ -149,7 +131,6 @@ def getJobs(driver):
             city = ', '.join(cities) if cities else ''
             state = ', '.join(states) if states else ''
             city_title, state_title = find_city_state_in_title(jobTitle)
-            print('city', city_title, state_title)
             if city_title:
                 city = city_title
             if state_title:

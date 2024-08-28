@@ -1,5 +1,5 @@
 import time
-from extractCityState import find_city_state_in_title
+from extractCityState import filter_job_title, find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -12,35 +12,6 @@ import os
 
 def request_url(driver, url):
     driver.get(url)
-
-def filter_job_title(job_title):
-    valid_titles = [
-        "Specialist",
-        "Speciality",
-        "Representative",
-        "District Manager",
-        "Regional manager",
-        "Account Manager",
-        "Sales Manager",
-        "Sales Rep",
-        "Sales Director",
-        "Account Executive",
-        "District Manager",
-        "Regional Manager",
-        "Account Manager",
-        "Sales Executive",
-        "Regional Director",
-        "Territory Manager",
-        "Account Executive",
-        "Senior Executive",
-        "Client Manager",
-        "Marketing Manager",
-        "Brand Manager"
-    ]
-    for valid_title in valid_titles:
-        if valid_title.lower() in job_title.lower():
-            return True
-    return False
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())

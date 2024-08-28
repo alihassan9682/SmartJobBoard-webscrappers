@@ -36,3 +36,19 @@ def find_city_state_in_title(title):
             break
 
     return detected_city, detected_state
+
+def filter_job_title(job_title):
+    sales_keywords = [
+        "sales",
+        "account manager",
+        "sales specialist",
+        "sales manager",
+        "representative",
+        "district",
+        "specialist",
+        "regional"
+    ]
+    for keyword in sales_keywords:
+        if keyword.lower() in job_title.lower():
+            return True
+    return False

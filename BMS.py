@@ -1,6 +1,6 @@
 import time
 
-from extractCityState import find_city_state_in_title
+from extractCityState import filter_job_title, find_city_state_in_title
 from helpers import configure_webdriver
 
 from selenium.webdriver.common.by import By
@@ -26,16 +26,6 @@ def write_to_csv(data, directory, filename):
         writer.writeheader()
         for item in data:
             writer.writerow(item)
-
-def filter_job_title(job_title):
-    valid_titles = [
-        "Therapeutic Area Specialist",
-        "Manager of Regional Operations",
-    ]
-    for valid_title in valid_titles:
-        if valid_title.lower() in job_title.lower():
-            return True
-    return False
 
 def loadAllJobs(driver):
     JOBS = []

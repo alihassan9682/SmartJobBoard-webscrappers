@@ -1,6 +1,6 @@
 import time
 
-from extractCityState import find_city_state_in_title
+from extractCityState import filter_job_title, find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 
 from selenium.webdriver.common.by import By
@@ -24,34 +24,6 @@ def write_to_csv(data, directory, filename):
         writer.writeheader()
         for item in data:
             writer.writerow(item)
-
-def filter_job_title(job_title):
-    valid_titles = [
-        "Specialist",
-        "Speciality",
-        "Representative",
-        "District Manager",
-        "Regional manager",
-        "Account Manager",
-        "Sales Manager",
-        "Sales Director",
-        "Account Executive",
-        "District Manager",
-        "Regional Manager",
-        "Account Manager",
-        "Sales Executive",
-        "Regional Director",
-        "Territory Manager",
-        "Account Executive",
-        "Senior Executive",
-        "Client Manager",
-        "Marketing Manager",
-        "Brand Manager"
-    ]
-    for valid_title in valid_titles:
-        if valid_title.lower() in job_title.lower():
-            return True
-    return False
 
 def loadAllJobs(driver):
     JOBS = []
@@ -84,23 +56,21 @@ def getJobs(driver):
     for job in jobs:
         try:
             driver.get(job)
-            time.sleep(3)
+            time.sleep(2)
             
             iframe = driver.find_element(By.ID, 'grnhse_iframe')
             driver.switch_to.frame(iframe)
+            time.sleep(2)
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
-            title_meta = soup.find("h1", class_="section-header")
+            title_meta = soup.find("h1", class_="app-title")
             jobTitle = title_meta.text if title_meta else ''
+            print("job title: " + jobTitle)
             if not filter_job_title(jobTitle):
                 continue
-            desc_content = soup.find('div', class_="job__description")
-            jobDescription = desc_content.prettify() if desc_content else ''
-            print('job description', jobDescription)
-            location_meta = desc_content.find_all('p')
-            Location = location_meta[1].text.strip() if location_meta else ''
-            print("Location",Location)
-            City = state = ''
+            desc_content = driver.find_element(By.ID, "content")
+            jobDescription = desc_content if desc_content else ''
+            City = state = Location = ''
             country = 'United States'
 
             city_title, state_title = find_city_state_in_title(Location)
