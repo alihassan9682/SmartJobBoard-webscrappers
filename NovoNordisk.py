@@ -177,7 +177,7 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "N/A",
+                "Employer Email": "msh@mshnovo.com",
                 "Full Name": "",
                 "Company Name": "Novo Nordisk",
                 "Employer Website": "https://www.novonordisk.com/",

@@ -85,6 +85,8 @@ def getJobs(driver):
             jobTitle = job_meta.text if job_meta else ''
             if not filter_job_title(jobTitle):
                 continue
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight/4);")
+            time.sleep(1)
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="jd-info")

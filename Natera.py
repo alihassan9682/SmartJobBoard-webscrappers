@@ -68,8 +68,8 @@ def getJobs(driver):
             print("job title: " + jobTitle)
             if not filter_job_title(jobTitle):
                 continue
-            desc_content = driver.find_element(By.ID, "content")
-            jobDescription = desc_content if desc_content else ''
+            desc_content = soup.find(id="content")
+            jobDescription = desc_content.prettify() if desc_content else ''
             City = state = Location = ''
             country = 'United States'
 
