@@ -71,7 +71,7 @@ def loadAllJobs(driver):
         )
         essential.click()
     except Exception as e:
-        print(f"Error clicking essential cookies button: {e}")
+        pass
 
     while True:
         try:
@@ -100,9 +100,9 @@ def loadAllJobs(driver):
                         driver.switch_to.window(driver.window_handles[0])
                         time.sleep(3)
                     else:
-                        print("New tab did not open as expected.")
+                        pass
                 except Exception as e:
-                    print(f"Error processing job: {e}")
+                    pass
 
             last_processed_index = len(jobs)
             try:
@@ -112,13 +112,13 @@ def loadAllJobs(driver):
                 driver.execute_script("arguments[0].click();", load_more_button)
                 time.sleep(3)
             except NoSuchElementException:
-                print("No more 'Load More' button found, all jobs are loaded.")
+                
                 break
             except Exception as e:
-                print(f"Error clicking load more button: {e}")
+               
                 break
         except Exception as e:
-            print(f"Error in main loop: {e}")
+            
             break
 
     return JOBS
@@ -153,7 +153,10 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-            Location = City + ', ' + state + ', ' + 'USA'
+
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+            
             jobDetails = {
                 "Job Id": jobs.index(job),
                 "Job Title": jobTitle,
@@ -177,7 +180,7 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "msh@mshnovo.com",
+                "Employer Email": "smsh@mshnovo.com",
                 "Full Name": "",
                 "Company Name": "Novo Nordisk",
                 "Employer Website": "https://www.novonordisk.com/",
@@ -189,7 +192,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -203,9 +206,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "NovoNordisk.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

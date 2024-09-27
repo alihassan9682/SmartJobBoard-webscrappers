@@ -54,7 +54,7 @@ def loadAllJobs(driver):
                     JOBS.append(job_url)
     
             except Exception as e:
-                print(f"Error processing job card: {e}")
+                pass
 
         last_processed_index = len(jobs)
         try:
@@ -68,10 +68,10 @@ def loadAllJobs(driver):
                 driver.execute_script("arguments[0].click();", load_more_button)
             time.sleep(2)
         except NoSuchElementException:
-            print("No more 'Load More' button found, all jobs are loaded.")
+            
             break
         except Exception as e:
-            print(f"Error clicking load more button: {e}")
+            
             break
     return JOBS
 
@@ -90,12 +90,13 @@ def getJobs(driver):
             jobTitle = job_meta.text if job_meta else ''
             if not filter_job_title(jobTitle):
                 continue
-            desc_content = soup.find("div", class_="position-job-description-column")
+            desc_content = soup.find_all("div", class_="row position-job-container")[1]
+
             jobDescription = desc_content.prettify()
 
             selected_card = soup.find("div", class_='card-selected')
             location_meta = selected_card.find("p",class_='field-label')
-            print('llooo', location_meta)
+            
             Location = location_meta.text if location_meta else ''
 
             state = City = ''
@@ -109,7 +110,10 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-            Location = City + ', ' + state + ', ' + 'USA'
+
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+
             Zipcode = ''
             jobDetails = {
                 "Job Id": jobs.index(job),
@@ -146,7 +150,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -160,9 +164,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "BMS.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

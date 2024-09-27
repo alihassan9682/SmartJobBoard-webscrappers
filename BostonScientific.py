@@ -22,10 +22,10 @@ def write_to_csv(data, directory, filename):
     filepath = os.path.join(directory, filename)
     with open(filepath, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+        if csvfile.tell() == 0:
+            writer.writeheader()
         for item in data:
             writer.writerow(item)
-
 
 def get_location_details(location):
     location_parts = location.split(',')
@@ -61,7 +61,7 @@ def loadAllJobs(driver):
         try:
             jobs = WebDriverWait(results, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "position-card")))
         except StaleElementReferenceException:
-            print("StaleElementReferenceException occurred while locating job cards.")
+            pass
             continue
         for index in range(last_processed_index, len(jobs)):
             job = jobs[index]
@@ -78,11 +78,10 @@ def loadAllJobs(driver):
                     JOBS.append(job_url)
     
             except StaleElementReferenceException as e:
-                print(f"StaleElementReferenceException encountered: {e}")
-                time.sleep(1)
+                
                 break
             except Exception as e:
-                print(f"Error processing job card: {e}")
+                pass
 
         last_processed_index = len(jobs)
         try:
@@ -96,10 +95,10 @@ def loadAllJobs(driver):
                 driver.execute_script("arguments[0].click();", load_more_button)
             time.sleep(2)
         except NoSuchElementException:
-            print("No more 'Load More' button found, all jobs are loaded.")
+            
             break
         except Exception as e:
-            print(f"Error clicking load more button: {e}")
+            
             break
     return JOBS
 
@@ -118,7 +117,7 @@ def getJobs(driver):
             jobTitle = job_meta.text if job_meta else ''
             if not filter_job_title(jobTitle):
                 continue
-            desc_content = soup.find("div", class_="position-job-description-column")
+            desc_content = soup.find_all("div", class_="col-md-8 position-job-description-column")
             jobDescription = desc_content.prettify() if desc_content else ''
 
             selected_card = soup.find("div", class_='card-selected')
@@ -132,7 +131,10 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-            Location = City + ', ' + state + ', ' + 'USA'
+            
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+
             country = 'United States'
             Zipcode = ''
 
@@ -171,7 +173,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -185,9 +187,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "bostonscientific.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

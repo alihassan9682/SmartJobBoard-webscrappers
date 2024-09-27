@@ -1,15 +1,16 @@
 import time
-from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
+from helpers import configure_webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
+from extractCityState import find_city_state_in_title
+from helpers import configure_webdriver, is_remote  
 import csv
 import os
+from extract_location import extracting_location
 
-def request_url(driver, url):
-    driver.get(url)
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -22,10 +23,11 @@ def write_to_csv(data, directory, filename):
         for item in data:
             writer.writerow(item)
 
+
 def loadAllJobs(driver):
     JOBS = []
     unique_jobs = set()
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 10)
 
     while True:
         try:
@@ -54,14 +56,13 @@ def loadAllJobs(driver):
                 break
             driver.switch_to.default_content()
         except TimeoutException:
-            print("Timeout: The element was not found within the specified timeout.")
             break
         except Exception as e:
-            print(f"An error occurred while loading jobs: {e}")
             break
         driver.switch_to.default_content()
 
     return JOBS
+
 
 def getJobs(driver):
     JOBS = []
@@ -74,9 +75,13 @@ def getJobs(driver):
 
             iframe = wait.until(EC.presence_of_element_located((By.ID, 'icims_content_iframe')))
             driver.switch_to.frame(iframe)
-            Location = "United States"
-            City = ''
-            state = ''
+            job_location = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='col-xs-6 header left']")))
+
+            job_location = job_location.text
+            job_location = job_location.split('\n')[1].strip() 
+        
+            City, state = find_city_state_in_title(job_location)
+
             country = 'United States'
             Zipcode = ''
 
@@ -105,8 +110,22 @@ def getJobs(driver):
                     field_value = field_value_element.text.strip()
                     job_details[field_name] = field_value
 
+            Job_id = job_details.get('Requisition ID', jobs.index(job))
+
+            Checking_remote1 = is_remote(job_location)
+            Checking_remote2 = is_remote(jobTitle)
+            if(Checking_remote1 or Checking_remote2):
+                Location = "Remote"
+                Remote = True
+            else:    
+                Location = extracting_location(City,state)
+                Remote = False
+
+            
+
+
             jobDetails = {
-                "Job Id": job_details.get('Requisition ID', jobs.index(job)),
+                "Job Id": Job_id,
                 "Job Title": jobTitle,
                 "Job Description": jobDescription,
                 "Job Type": job_details.get('Position Type', ''),
@@ -116,8 +135,8 @@ def getJobs(driver):
                 "State": state,
                 "Country": country,
                 "Zip Code": Zipcode,
-                "Address": Location,
-                "Remote": '',
+                "Address": job_location,
+                "Remote": Remote,
                 "Salary From": "",
                 "Salary To": "",
                 "Salary Period": "",
@@ -142,7 +161,7 @@ def getJobs(driver):
             driver.switch_to.default_content()
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 def scraping():
@@ -153,10 +172,10 @@ def scraping():
         try:
             driver.get(url)
             Jobs = getJobs(driver)
-            write_to_csv(Jobs, "data", "BBraun.csv")
+            write_to_csv(Jobs, "data", "B Braun.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 scraping()

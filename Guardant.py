@@ -108,6 +108,8 @@ def getJobs(driver):
             location_meta = job_details.get('Formatted Address', '')
             Location = location_meta if location_meta else ''
 
+            
+
             Zipcode = ''
             jobDetails = {
                 "Job Id": jobs.index(job),
@@ -144,7 +146,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 def scraping():
@@ -157,8 +159,8 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "Guardant.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 scraping()

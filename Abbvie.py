@@ -52,7 +52,6 @@ def loadAllJobs(driver):
             next_page_elements = driver.find_elements(By.CSS_SELECTOR, f"a[href='javascript:pagination({next_page_number})']")
             
             if not next_page_elements:
-                print("No next page element found. Exiting the loop.")
                 break
             
             next_page_element = next_page_elements[0]
@@ -62,7 +61,7 @@ def loadAllJobs(driver):
             current_page += 1
             time.sleep(2)
         except Exception as e:
-            print(f"Error clicking Show all button: {e}")
+            
             break
         except:
             break
@@ -97,7 +96,10 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-            Location = City + ', ' + state + ', ' + 'USA'
+                
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", attrs={"aria-label":"Job description"})
@@ -151,7 +153,7 @@ def getJobs(driver):
             }
             JOBS.append(jobDetails)
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -165,9 +167,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "Abbvie.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

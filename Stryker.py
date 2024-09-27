@@ -64,14 +64,17 @@ def loadAllJobs(driver):
                     driver.execute_script("arguments[0].click();", next_button)
                     time.sleep(2)
                 else:
-                    print('No more next button')
+                    
                     break
             else:
                 break
         except:
-            print("No more pages or an error occurred")
+            
             break
-
+   
+    
+    
+        
     return JOBS
 
 
@@ -166,7 +169,8 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
+    
     return JOBS
 
 
@@ -178,11 +182,12 @@ def scraping():
         try:
             driver.get(url)
             Jobs = getJobs(driver)
+            
             write_to_csv(Jobs, "data", "Stryker.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

@@ -1,18 +1,14 @@
-import time
-from selenium.webdriver.common.by import By
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import (
-    NoSuchElementException, ElementClickInterceptedException, StaleElementReferenceException
-)
+from extractCityState import  find_city_state_in_title
+from selenium.webdriver.common.by import By
+from helpers import configure_webdriver
 from bs4 import BeautifulSoup
 import csv
 import os
 
-from helpers import configure_webdriver, is_remote
 
-def request_url(driver, url):
-    driver.get(url)
 
 def write_to_csv(data, directory, filename):
     fieldnames = list(data[0].keys())
@@ -42,20 +38,17 @@ def loadAllJobs(driver):
                         job_link = job.find_element(By.CLASS_NAME, 'opportunity-link').get_attribute("href")
                         JOBS.append(job_link)
                     except StaleElementReferenceException as e:
-                        print(f"StaleElementReferenceException encountered: {e}")
-                        time.sleep(1)
+                        pass
                     except Exception as e:
-                        print(f"Error processing job card: {e}")
-
+                        pass
             except Exception as e:
-                print(f"Error during job loading or pagination: {e}")
-
+                pass
         else:
-            print("Shadow root not found.")
+            pass
     except Exception as e:
-        print(f"Error handling cookie consent: {e}")
+        pass
 
-    time.sleep(2)
+    
     return JOBS
 
 def getJobs(driver):
@@ -69,7 +62,7 @@ def getJobs(driver):
         for job in jobs:
             try:
                 driver.get(job)
-                time.sleep(2)
+                
                 page_source = driver.page_source
                 soup = BeautifulSoup(page_source, "html.parser")
                 
@@ -81,14 +74,23 @@ def getJobs(driver):
                 jobTitle = get_text_if_exists(soup, 'span[data-automation="opportunity-title"]')
                 job_id = get_text_if_exists(soup, 'span[data-automation="requisition-number"]')
                 if not job_id:
-                    job_id = jobs.index(job)  # Use index if job_id is not found
+                    job_id = jobs.index(job)  
 
                 posted_date = get_text_if_exists(soup, 'span[data-automation="job-posted-date"]')
+
                 location_meta = get_text_if_exists(soup, 'span[data-automation="city-state-zip-country-label"]')
+
+
                 location_parts = location_meta.split(',') if location_meta else []
-                City = location_parts[0].strip() if len(location_parts) == 3 else ''
-                state = location_parts[1].strip() if len(location_parts) == 3 else ''
+                
+                try:
+                    City = location_parts[0].strip() if len(location_parts) == 3 else ''
+                    state = location_parts[1].strip() if len(location_parts) == 3 else ''
+                except:
+                    City, state = find_city_state_in_title(location_meta)    
+
                 country = 'United States'
+
                 Remote = 'Remote' in get_text_if_exists(soup, 'span[data-automation="name-and-location-id-label"]')
 
                 desc_content = soup.find("p", class_="opportunity-description")
@@ -127,12 +129,11 @@ def getJobs(driver):
                     "Status": "Active",
                 }
                 JOBS.append(jobDetails)
-
                 driver.switch_to.default_content()
-            except Exception as e:
-                print(f"Error in loading post details: {e}")
+            except:
+                pass
     else:
-        print("Shadow root not found.") 
+        pass 
     return JOBS
 
 def scraping():
@@ -146,10 +147,10 @@ def scraping():
             if Jobs:
                 write_to_csv(Jobs, "data", "Lantheus.csv")
             else:
-                print("No jobs found.")
+                pass
         except Exception as e:
-            print(f"Error during job scraping: {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 scraping()

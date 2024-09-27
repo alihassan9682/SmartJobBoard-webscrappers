@@ -67,7 +67,7 @@ def loadAllJobs(driver):
             else:
                 break
         except:
-            print("No more pages or an error occurred")
+           
             break
 
 
@@ -119,7 +119,7 @@ def getJobs(driver):
                 job_details['requisition_id'] = requisition_id_element.text
 
             except Exception as e:
-                print(f"Error occurred: {e}")
+                pass
 
             location_div = wait.until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'css-cygeeu'))
@@ -159,7 +159,12 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-            location = City + ', ' + state + ', ' + 'USA'
+            
+            
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+
+
             Zipcode = ''
 
             jobDetails = {
@@ -197,7 +202,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -211,9 +216,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "ExactSciences.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

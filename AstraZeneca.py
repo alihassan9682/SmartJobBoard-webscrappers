@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -34,7 +36,7 @@ def loadAllJobs(driver):
             (By.CLASS_NAME, "wscrOk2")))
         close.click()
     except Exception as e:
-        print(f"Alert close button not found: {e}")
+        pass
 
     try:
         location_section = wait.until(
@@ -49,12 +51,12 @@ def loadAllJobs(driver):
         driver.execute_script("arguments[0].click();", checkbox)
         time.sleep(2)
     except Exception as e:
-        print(f"Error locating or clicking checkbox: {e}")
+        pass
 
     try:
         wait.until(EC.presence_of_element_located((By.ID, "applied-filters")))
     except Exception as e:
-        print(f"Filters not applied, retrying: {e}")
+        
         location_section = wait.until(
             EC.presence_of_element_located((By.ID, "country-toggle")))
         actions = ActionChains(driver)
@@ -77,7 +79,7 @@ def loadAllJobs(driver):
         try:
             next_button = driver.find_element(By.CLASS_NAME, "next")
             if 'disabled' in next_button.get_attribute('class'):
-                print('No more pages')
+                
                 break
             else:
                 driver.execute_script(
@@ -87,7 +89,7 @@ def loadAllJobs(driver):
                 driver.execute_script("arguments[0].click();", next_button)
                 time.sleep(2)
         except Exception as e:
-            print(f"No next button found or error clicking it: {e}")
+            
             break
     print(f"Found {len(JOBS)} jobs")
     return JOBS
@@ -135,7 +137,10 @@ def getJobs(driver):
                 city = city_title
             if state_title:
                 state = state_title
-            Location = city + ', ' + state + ', ' + 'USA'
+
+            from extract_location import extracting_location
+            Location = extracting_location(city,state)
+            
             country = 'United States'
             Zipcode = ''
 
@@ -179,7 +184,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -193,9 +198,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "AstraZeneca.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

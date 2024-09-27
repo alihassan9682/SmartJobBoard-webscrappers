@@ -9,25 +9,40 @@ if getattr(sys, 'frozen', False):
 else:
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
+
 scrapers = [
-    'Abbvie.py',
-    'Amgen.py',
-    'AstraZeneca.py', 
-    'BMS.py',
-    'Natera.py',
-    'Guardant.py',
-    'ExactSciences.py',
-    'ThermoFisher.py',
-    'Baxter.py',
-    'Becton.py',
-    'NovoNordisk.py',
-    'Sanofi.py',
-    'Boston.py',
-    'Abbott.py',
-    'Merck.py',
-    'Jhonsan.py',
-    'Stryker.py',
-    'Medtronic.py'
+
+    # 'AmplityHealth.py',
+    # 'Amgen.py',
+    # 'Jhonsan.py',
+    # 'Abbott.py',
+    # 'Abbvie.py',
+    # 'AstraZeneca.py',
+    # 'Baxter.py',
+    # 'Becton.py',
+    # 'BMS.py',
+    # 'BostonScientific.py',
+    # 'ExactSciences.py',
+    # 'Guardant.py',
+    # 'Medtronic.py',
+    # 'Merck.py',
+    # 'NovoNordisk.py',
+    # 'Eisai.py',
+    # 'EVERSANA.py',
+    # 'TeleFlex.py',
+    # 'Sanofi.py',
+    # 'Stryker.py',
+    # 'ThermoFisher.py',
+    # 'Conmed.py',
+    # 'NeoGenomics.py',
+    # 'BD.py',
+    # 'Syneo.py',
+     'IQVIA.py',
+    # 'Myriad.py',
+    # 'EliLilly.py',
+    # 'Lantheus.py',
+    # 'B Braun.py',
+    #'Biogen.py',
 ]
 
 def run_scraper(scraper):
@@ -36,6 +51,7 @@ def run_scraper(scraper):
         result = subprocess.run(['python', scraper_path], check=True)
         print(f"{scraper} completed successfully.")
         upload_file(f'{scraper.split(".")[0]}.csv')
+        
         return True
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while running {scraper}: {e}")

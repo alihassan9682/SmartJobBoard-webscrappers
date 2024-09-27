@@ -83,7 +83,10 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-            Location = City + ', ' + state + ', ' + 'USA'
+            
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+
             page_source = driver.page_source
             soup = BeautifulSoup(page_source, "html.parser")
             desc_content = soup.find("div", class_="jd-info")
@@ -124,7 +127,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -138,9 +141,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "Merck.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

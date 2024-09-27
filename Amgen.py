@@ -2,7 +2,7 @@ import time
 
 from extractCityState import filter_job_title, find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
-
+from extract_location import extracting_location
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -64,7 +64,7 @@ def loadAllJobs(driver):
             else:
                 break
         except:
-            print("No more pages or an error occurred")
+            
             break
 
     return JOBS
@@ -143,14 +143,12 @@ def getJobs(driver):
                 state = ','.join(
                 sorted(set([single_state.strip() for single_state in state.split(',')])))  
             else:
-                print("No additional locations found")
+                pass
 
-            city_title, state_title = find_city_state_in_title(jobTitle)
-            if city_title:
-                City = city_title
-            if state_title:
-                state = state_title
-            Location = City + ', ' + state + ', ' + 'USA'
+            City, state = find_city_state_in_title(jobTitle)
+            
+            Location = extracting_location(City,state)
+            
             Zipcode = ''
             job_id = soup.find("span", class_="job-id job-info").text if soup.find(
                 "span", class_="job-id job-info") else ""
@@ -196,7 +194,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -210,9 +208,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "Amgen.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

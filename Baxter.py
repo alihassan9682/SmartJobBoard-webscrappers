@@ -126,7 +126,10 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-            Location = City + ', ' + state + ', ' + 'USA'
+
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+            
             Zipcode = ''
 
             jobDetails = {

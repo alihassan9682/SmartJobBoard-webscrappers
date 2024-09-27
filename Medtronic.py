@@ -74,10 +74,10 @@ def loadAllJobs(driver):
                     driver.execute_script("arguments[0].click();", next_button)
                     time.sleep(2)
             else:
-                print('No more next button')
+                
                 break
         except:
-            print("No more pages or an error occurred")
+            
             break
     return JOBS
 
@@ -98,7 +98,8 @@ def getJobs(driver):
                 continue
             city_title, state_title = find_city_state_in_title(jobTitle)
             desc_content = soup.select_one("[data-automation-id='jobPostingDescription']")
-            jobDescription = desc_content.get_text() if desc_content else ''
+            jobDescription = str(desc_content) if desc_content else ''
+
             job_details = soup.select_one("[data-automation-id='job-posting-details']")
             location_meta = job_details.select_one('div[data-automation-id="locations"] dd') if job_details else ''
             Location = location_meta.get_text() if location_meta else ''
@@ -116,7 +117,10 @@ def getJobs(driver):
                 City = city_title
             if state_title:
                 state = state_title
-            Location = City + ', ' + state + ', ' + 'USA'
+            
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+
             Zipcode = ''
 
             jobDetails = {
@@ -154,11 +158,10 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except StaleElementReferenceException as e:
-            print(f"StaleElementReferenceException encountered: {e}")
-            time.sleep(1)
+            
             continue
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 def scraping():
@@ -171,9 +174,9 @@ def scraping():
             Jobs = getJobs(driver)
             write_to_csv(Jobs, "data", "Medtronic.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

@@ -11,30 +11,38 @@ us_states_rev = us.states.mapping('name', 'abbr')
 def find_city_state_in_title(title):
     title_cleaned = title.lower()
 
-    print(f"Processing title: {title_cleaned}")
+    
 
     detected_city = None
     detected_state = None
+    try:
+        for city in us_cities.values():
+            city_name = city['name'].lower()
+            #if re.search(rf'\b{re.escape(city_name)}\b', title_cleaned):
+            if re.search(rf'\b{re.escape(city_name)}\b', title_cleaned):
+    
+                detected_city = city['name']
+                
+                break
+    except:
+        pass        
+    try:
+        for state_name in us_states.values():
+            if re.search(rf'\b{re.escape(state_name.lower())}\b', title_cleaned):
+                detected_state = state_name
+                
+                break
+    except:
+        pass
 
-    for city in us_cities.values():
-        city_name = city['name'].lower()
-        if re.search(rf'\b{re.escape(city_name)}\b', title_cleaned):
-            detected_city = city['name']
-            print(f"Found city: {detected_city} in title")
-            break
-
-    for state_name in us_states.values():
-        if re.search(rf'\b{re.escape(state_name.lower())}\b', title_cleaned):
-            detected_state = state_name
-            print(f"Found state: {detected_state} in title")
-            break
-
-    for abbr, name in us_states.items():
-        if re.search(rf'\b{re.escape(abbr.lower())}\b', title_cleaned, re.IGNORECASE):
-            detected_state = name
-            print(f"Found state abbreviation: {abbr.upper()} (state: {name}) in title")
-            break
-
+    try:    
+        for abbr, name in us_states.items():
+            if re.search(rf'\b{re.escape(abbr.lower())}\b', title_cleaned, re.IGNORECASE):
+                detected_state = name
+                
+                break
+    except:
+        pass
     return detected_city, detected_state
 
 def filter_job_title(job_title):

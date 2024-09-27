@@ -114,14 +114,16 @@ def getJobs(driver):
                     city = state = ''
                     country = 'United States'
             else:
-                print('issue with the location')
+                pass
+                
             Zipcode = ''
-            city_title, state_title = find_city_state_in_title(jobTitle)
-            if city_title:
-                city = city_title
-            if state_title:
-                state = state_title
-            location = city + ', ' + state + ', ' + 'USA'
+            city, state = find_city_state_in_title(jobTitle)
+            City, state = find_city_state_in_title(Location)
+            
+            from extract_location import extracting_location
+            Location = extracting_location(City,state)
+            
+
             date_posted = soup.find('div', class_='job-info au-target')['data-ph-at-job-post-date-text']
             job_id = soup.find('div', class_='job-info au-target')['data-ph-at-job-id-text']
 
@@ -160,7 +162,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -172,11 +174,12 @@ def scraping():
         try:
             driver.get(url)
             Jobs = getJobs(driver)
+            
             write_to_csv(Jobs, "data", "Abbott.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

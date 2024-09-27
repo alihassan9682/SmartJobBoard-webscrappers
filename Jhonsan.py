@@ -27,6 +27,7 @@ def write_to_csv(data, directory, filename):
 
 
 def loadAllJobs(driver):
+    
     JOBS = []
     wait = WebDriverWait(driver, 10)
     essential = wait.until(
@@ -56,7 +57,7 @@ def loadAllJobs(driver):
             driver.get(next)
         except:
             break
-
+    print(f"Returning jobs in Load all jobs {(len(JOBS))}")
     return JOBS
 
 
@@ -95,7 +96,10 @@ def getJobs(driver):
                 city = city_title
             if state_title:
                 state = state_title
-            location = city + ', ' + state + ', ' + 'USA'
+            
+            from extract_location import extracting_location
+            location = extracting_location(city,state)
+
             jobDetails = {
                 "Job Id": function_li[6].span.text.strip(),
                 "Job Title": jobTitle,
@@ -119,9 +123,9 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "msh@mshjhonsan.com",
+                "Employer Email": "msh@mshjandj.com",
                 "Full Name": "",
-                "Company Name": "Johnson and Johnson",
+                "Company Name": "Johnson & Johnson",
                 "Employer Website": "https://jobs.jnj.com/",
                 "Employer Phone": "",
                 "Employer Logo": "",
@@ -131,7 +135,8 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+           pass
+         
     return JOBS
 
 
@@ -142,12 +147,13 @@ def scraping():
         url = "https://jobs.jnj.com/en/jobs/?search=sales&country=United+States&pagesize=20#results"
         try:
             driver.get(url)
+            
             Jobs = getJobs(driver)
-            write_to_csv(Jobs, "data", "Jhonsan.csv")
+            write_to_csv(Jobs, "data", "Johnson & Johnson.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()

@@ -1,5 +1,5 @@
 import time
-
+from extract_location import extracting_location
 from extractCityState import filter_job_title, find_city_state_in_title
 from helpers import configure_webdriver, configure_undetected_chrome_driver, is_remote
 
@@ -73,16 +73,10 @@ def getJobs(driver):
             City = state = Location = ''
             country = 'United States'
 
-            city_title, state_title = find_city_state_in_title(Location)
-            if city_title:
-                City = city_title
-            if state_title:
-                state = state_title
-            if city_title and state_title:
-                Location = city_title + ', ' + state_title
-            else:
-                Location = ''
-            Location = City + ', ' + state + ', ' + 'USA'
+            City, state = find_city_state_in_title(Location)
+            Location = extracting_location(City,state)
+            print(Location)
+
             Zipcode = ''
             jobDetails = {
                 "Job Id": jobs.index(job),

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -73,7 +75,7 @@ def loadAllJobs(driver):
         try:
             next_button = driver.find_element(By.CLASS_NAME, "next")
             if 'disabled' in next_button.get_attribute('class'):
-                print('no more pages')
+                
                 break
             else:
                 driver.execute_script("arguments[0].scrollIntoView(true);", next_button)
@@ -122,7 +124,10 @@ def getJobs(driver):
                 city = city_title
             if state_title:
                 state = state_title
-            Location = city + ', ' + state + ', ' + 'USA'
+
+            from extract_location import extracting_location
+            Location = extracting_location(city,state)
+            
             country = 'United States'
             Zipcode = ''
             date_posted = soup.find('span', class_='job-date').text if soup.find('span', class_='job-date') else ''
@@ -151,7 +156,7 @@ def getJobs(driver):
                 "Applications": "",
                 "Status": "",
                 "Views": "",
-                "Employer Email": "msh@mshsnofi.com",
+                "Employer Email": "msh@mshsanofi.com",
                 "Full Name": "",
                 "Company Name": "Sanofi",
                 "Employer Website": "https://en.jobs.sanofi.com/",
@@ -163,7 +168,7 @@ def getJobs(driver):
             JOBS.append(jobDetails)
 
         except Exception as e:
-            print(f"Error in loading post details: {e}")
+            pass
     return JOBS
 
 
@@ -175,11 +180,12 @@ def scraping():
         try:
             driver.get(url)
             Jobs = getJobs(driver)
+            
             write_to_csv(Jobs, "data", "Sanofi.csv")
         except Exception as e:
-            print(f"Error : {e}")
+            pass
     except Exception as e:
-        print(f"An error occurred: {e}")
+        pass
 
 
 scraping()
